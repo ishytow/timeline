@@ -43,11 +43,8 @@ define(['moment', 'templates'],function(moment, JST){
                 var days = [];
                 var offSet = this.getOffset();
                 for (var i = 0; i < this.config.daysCount; i++){
-                    if(offSet >= 0){
-                        days.push(moment().add(i + offSet, 'days').hour(0).minute(0).second(0).locale('en'));
-                    }else{
-                        days.push(moment().subtract(i + offSet, 'days').hour(0).minute(0).second(0).locale('en'));
-                    }
+                    var offSetDelta = i + offSet;
+                    days.push(moment().add(i + offSet, 'days').hour(0).minute(0).second(0).locale('en'));
                 }
                 return days;
             },

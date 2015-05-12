@@ -15,7 +15,7 @@ define([
         var events = [];
         var offset =  Utils.getOffset();
 
-        for (var i = 1; i < 2; i++) {
+        for (var i = 1; i <= Utils.getDays().length; i++) {
             var id = i+offset;
 
             var startItemTime = new Date();
@@ -45,6 +45,7 @@ define([
         renderItems: function(){
             this.items = [];
             this.collection = new EventsCollection(mockedEvents());
+            console.log(this.collection);
             this.collection.each(function(event){
                 var eventView = new Event({model: event});
                 var eventItems = eventView.renderItem().items;

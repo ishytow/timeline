@@ -24,7 +24,7 @@ define([
 
         initialize: function () {
             EventListener.get('timeline').on('timeline-created', function(options){
-                this.initPopovers(options.timeLineEl);
+                this.initPopover(options.timeLineEl);
             }.bind(this));
         },
 
@@ -55,7 +55,6 @@ define([
                 }
 
                 if(start !== null && end !== null){
-
                     items.push({
                         id: this.model.get('id') + '-g-' + i,
                         eventId: this.model.get('id'),
@@ -75,11 +74,11 @@ define([
 
         initEvents: function(){
             var selector = '.popover-content .event-id-'+this.model.get('id');
-            $(document).on('click', selector + ' .edit', this.edit);
-            $(document).on('click', selector + ' .remove', this.removeEvent);
+            $(document).off('click', selector + ' .edit').on('click', selector + ' .edit', this.edit);
+            $(document).off('click', selector + ' .remove').on('click', selector + ' .remove', this.removeEvent);
         },
 
-        initPopovers: function(timeLineEl){
+        initPopover: function(timeLineEl){
             var _this = this;
             this.$el = timeLineEl.find('.event-item-' + this.model.get('id'));
             this.$el.popover({
