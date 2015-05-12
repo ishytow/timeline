@@ -15,7 +15,7 @@ define([
         var events = [];
         var offset =  Utils.getOffset();
 
-        for (var i = 1; i <= 4; i++) {
+        for (var i = 1; i < 2; i++) {
             var id = i+offset;
 
             var startItemTime = new Date();
@@ -43,11 +43,9 @@ define([
         items: [],
 
         renderItems: function(){
+            this.items = [];
             this.collection = new EventsCollection(mockedEvents());
             this.collection.each(function(event){
-                console.log('-----------');
-                console.log(event);
-                console.log('-----------');
                 var eventView = new Event({model: event});
                 var eventItems = eventView.renderItem().items;
                 $.merge(this.items, eventItems);

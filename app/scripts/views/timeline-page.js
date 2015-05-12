@@ -7,8 +7,9 @@ define([
     'templates',
     'views/timeline',
     'views/events',
-    'utils'
-], function ($, _, Backbone, JST, TimelineView, EventsView, Utils) {
+    'utils',
+    'EventListener'
+], function ($, _, Backbone, JST, TimelineView, EventsView, Utils, EventListener) {
     'use strict';
 
     var TimelinePageView = Backbone.View.extend({
@@ -19,7 +20,7 @@ define([
         getTimelineView: function(){
             this.eventsView = new EventsView();
             var items = this.eventsView.renderItems().items;
-            console.log(items);
+
             if(this.timelineView === null){
                 this.timelineView = new TimelineView({items: items});
             }else{
@@ -33,18 +34,22 @@ define([
             return this.getTimelineView().render();
         },
 
+        updateTimeline: function(){
+            this.getTimelineView().updateTimeline();
+        },
+
         render: function () {
             this.$el.html(this.template());
             this.$el.find('#timeline-container').html(this.renderTimeline().$el);
-
             this.$el.find('#timeline-container').on('mousewheel', function(e){
-                if(e.originalEvent.wheelDelta /120 > 0) {
+                var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1
+                if(events / 120 > 0) {
                     Utils.setWeek(Utils.getWeek() - 1);
                 }else{
                     Utils.setWeek(Utils.getWeek() + 1);
                 }
-
-                this.$el.find('#timeline-container').html(this.renderTimeline().$el);
+                EventListener.get('timeline').trigger('timelineScrolled');
+                this.updateTimeline();
             }.bind(this));
             return this;
         }

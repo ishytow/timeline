@@ -28,11 +28,11 @@ define([
             }.bind(this));
         },
 
-        getItemsByEvent: function(event){
+        getItemsByEvent: function(){
             var items = [];
             var days = Utils.getDays();
-            var eventStartDate = moment(event.get('startDate'));
-            var eventEndDate = moment(event.get('endDate'));
+            var eventStartDate = moment(this.model.get('startDate'));
+            var eventEndDate = moment(this.model.get('endDate'));
             var startScaleDate = moment(Utils.getStartScaleDate());
             var endScaleDate = moment(Utils.getEndScaleDate());
             var lastDate = days[days.length - 1].clone();
@@ -55,12 +55,13 @@ define([
                 }
 
                 if(start !== null && end !== null){
+
                     items.push({
-                        id: event.get('id') + '-g-' + i,
-                        eventId: event.get('id'),
-                        className: 'event-item-' + event.get('id'),
-                        userName: event.get('userName'),
-                        eventName: event.get('eventName'),
+                        id: this.model.get('id') + '-g-' + i,
+                        eventId: this.model.get('id'),
+                        className: 'event-item-' + this.model.get('id'),
+                        userName: this.model.get('userName'),
+                        eventName: this.model.get('eventName'),
                         eventStartDate: eventStartDate.locale('en').format('MM.DD, HH:mm'),
                         eventEndDate: eventEndDate.locale('en').format('MM.DD, HH:mm'),
                         start: start,
@@ -98,7 +99,7 @@ define([
         },
 
         renderItem: function(){
-            this.items = this.getItemsByEvent(this.model, this.days);
+            this.items = this.getItemsByEvent(this.days);
             return this;
         }
     });

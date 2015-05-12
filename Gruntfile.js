@@ -272,7 +272,6 @@ module.exports = function (grunt) {
                 'createDefaultTemplate',
                 'handlebars',
                 'connect:dist',
-                'open:server',
                 'watch'
             ]);
         }

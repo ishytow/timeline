@@ -32,10 +32,9 @@ define(['moment', 'templates'],function(moment, JST){
 
             getGroups: function(){
                 var days = this.getDays();
-                var offSet = this.getOffset();
                 var groups = [];
                 for (var i = 0; i < days.length; i++) {
-                    groups.push({id: i, content: days[i].format('ddd, DD.MM'), className: 'tileline-row-' + i, style: 'min-height: 47px;'});
+                    groups.push({id: i, content: days[i].format('ddd, DD.MM'), className: 'tileline-group-' + i, style: 'min-height: 47px;'});
                 }
                 return groups;
             },
