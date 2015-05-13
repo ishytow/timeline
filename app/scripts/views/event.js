@@ -14,13 +14,7 @@ define([
     var EventView = Backbone.View.extend({
         items: [],
 
-        edit: function(){
-            console.log('edit');
-        },
-
-        removeEvent: function(){
-            console.log('remove');
-        },
+        modalTemplate: JST['app/scripts/templates/event-modal.hbs'],
 
         initialize: function () {
             EventListener.get('timeline').on('timeline-created', function(options){
@@ -72,10 +66,24 @@ define([
             return items;
         },
 
+        edit: function(){
+            console.log('edit');
+            $('#modals-container').html(this.modalTemplate(this.model.toJSON()));
+            $('#modals-container #modal-' + this.model.get('id')).modal('show');
+        },
+
+        removeEvent: function(){
+            console.log('remove');
+        },
+
         initEvents: function(){
-            var selector = '.popover-content .event-id-'+this.model.get('id');
-            $(document).off('click', selector + ' .edit').on('click', selector + ' .edit', this.edit);
-            $(document).off('click', selector + ' .remove').on('click', selector + ' .remove', this.removeEvent);
+            var selector = '.popover-content .event-id-' + this.model.get('id');
+            $(document).off('click', selector + ' .edit').on('click', selector + ' .edit', this.edit.bind(this));
+            $(document).off('click', selector + ' .remove').on('click', selector + ' .remove', this.removeEvent.bind(this));
+        },
+
+        initModal: function(){
+            console.log($('#modals-container').length);
         },
 
         initPopover: function(timeLineEl){
@@ -95,6 +103,7 @@ define([
             });
 
             this.initEvents();
+            this.initModal();
         },
 
         renderItem: function(){

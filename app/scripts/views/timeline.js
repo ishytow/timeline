@@ -41,9 +41,10 @@ define([
                 $popoverEls.not(this).popover('hide');
             });
             $(document).on('click', function (e) {
-                if (!$(e.target).is('.item[class*="event-item-"]')
+                if ((!$(e.target).is('.item[class*="event-item-"]')
                     && $(e.target).parents('.item[class*="event-item-"]').length === 0
-                    && $(e.target).parents('.popover.in').length === 0) {
+                    && $(e.target).parents('.popover.in').length === 0)
+                    || $(e.target).is('.display-mode .edit, .display-mode .remove')) {
                     $popoverEls.popover('hide');
                 }
             });
