@@ -34,23 +34,28 @@ define([
             return this.getTimelineView().render();
         },
 
-        updateTimeline: function(){
-            this.getTimelineView().updateTimeline();
+        updateTimeline: function(options){
+            this.getTimelineView().updateTimeline(options);
+        },
+
+        onMouseWheel: function(e){
+            var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1;
+            var scrollDirection;
+            if(events / 120 > 0) {
+                Utils.setWeek(Utils.getWeek() - 1);
+                scrollDirection = 'up';
+            }else{
+                Utils.setWeek(Utils.getWeek() + 1);
+                scrollDirection = 'down';
+            }
+            EventListener.get('timeline').trigger('timelineScrolled');
+            this.updateTimeline({scrollDirection: scrollDirection});
         },
 
         render: function () {
             this.$el.html(this.template());
             this.$el.find('#timeline-container').html(this.renderTimeline().$el);
-            this.$el.find('#timeline-container').on('mousewheel', function(e){
-                var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1
-                if(events / 120 > 0) {
-                    Utils.setWeek(Utils.getWeek() - 1);
-                }else{
-                    Utils.setWeek(Utils.getWeek() + 1);
-                }
-                EventListener.get('timeline').trigger('timelineScrolled');
-                this.updateTimeline();
-            }.bind(this));
+            this.$el.find('#timeline-container').on('mousewheel', this.onMouseWheel.bind(this));
             return this;
         }
     });

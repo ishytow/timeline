@@ -47,59 +47,68 @@ define([
                     $popoverEls.popover('hide');
                 }
             });
-            EventListener.get('timeline').on('timelineScrolled', function(){
-                //$popoverEls.popover('hide');
-                console.log(1);
-            });
         },
 
-        renderTimeline: function(){
-            this.$el.parent('#timeline-container').height(this.$el.height());
-            this.$el.animate(
-                {'marginTop' : "-=1500px", 'opacity': 0},
-                500,
-                function(){
-                    if(this.timeline !== null){
-                        this.timeline.clear();
-                    }else{
-                        this.timeline = new vis.Timeline(this.el);
-                        this.timeline.setOptions(this.options);
-                    }
-                    this.timeline.setOptions(this.options);
-                    this.timeline.setGroups(this.groups);
-                    this.timeline.setItems(this.items);
-                    this.timeline.on('select', function (options) {
-                        this.timeline.setSelection([]);
-                        if(options && options.items) {
-                            _.each(options.items, function (itemId) {
-                                var selectedId = itemId.substr(0, itemId.indexOf('-g-'));
-                                var itemsById = [];
-                                for (var i = 0; i < this.groups.length; i++){
-                                    itemsById.push(selectedId + '-g-' + i);
-                                }
-                                this.timeline.setSelection(itemsById);
-                            }.bind(this));
+        initTimeline: function(){
+            if(this.timeline !== null){
+                this.timeline.clear();
+            }else{
+                this.timeline = new vis.Timeline(this.el);
+                this.timeline.setOptions(this.options);
+            }
+            this.timeline.setOptions(this.options);
+            this.timeline.setGroups(this.groups);
+            this.timeline.setItems(this.items);
+            this.timeline.on('select', function (options) {
+                this.timeline.setSelection([]);
+                if(options && options.items) {
+                    _.each(options.items, function (itemId) {
+                        var selectedId = itemId.substr(0, itemId.indexOf('-g-'));
+                        var itemsById = [];
+                        for (var i = 0; i < this.groups.length; i++){
+                            itemsById.push(selectedId + '-g-' + i);
                         }
+                        this.timeline.setSelection(itemsById);
                     }.bind(this));
-                    this.initPopovers();
-
-                    this.$el.css('marginTop', '+=3000px').animate(
-                        {'marginTop' : "-=1500px", 'opacity': 1},
-                        500,
-                        function(){
-                            this.$el.parent('#timeline-container').animate(
-                                {'height' : this.$el.height() + 'px'},
-                                200,
-                                function(){
-                                    this.$el.parent('#timeline-container').height(this.$el.height());
-                                }.bind(this));
-                    }.bind(this));
-
-                }.bind(this));
+                }
+            }.bind(this));
+            this.initPopovers();
         },
 
-        updateTimeline: function(){
-            this.renderTimeline();
+        renderTimeline: function(options){
+            this.$el.parent('#timeline-container').height(this.$el.height());
+            if(options && options.scrollDirection){
+                var animationParams;
+                if(options.scrollDirection === 'up'){
+                    animationParams = {
+                        marginTop: '+=1500px',
+                        marginTopReverse: '-=3000px'
+                    }
+                }else{
+                    animationParams = {
+                        marginTop: '-=1500px',
+                        marginTopReverse: '+=3000px'
+                    }
+                }
+                this.$el.stop().animate({'marginTop' : animationParams.marginTop, 'opacity': 0},200,function(){
+                    this.initTimeline();
+                    this.$el.css('marginTop', animationParams.marginTopReverse)
+                        .animate({'marginTop' : '0px', 'opacity': 1},200,function(){
+                            this.$el.parent('#timeline-container').animate({'height' : this.$el.height() + 'px'},200,function(){
+                                this.$el.parent('#timeline-container').height(this.$el.height());
+                            }.bind(this));
+                        }.bind(this));
+                }.bind(this));
+            }else{
+                this.$el.hide(function(){
+                    this.initTimeline();
+                    this.$el.fadeIn(1000);
+                }.bind(this));
+            }
+        },
+
+        updateTimeline: function(options){
+            this.renderTimeline(options);
         },
 
         render: function () {
