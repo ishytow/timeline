@@ -1,0 +1,30 @@
+<div class="modal fade" id="edit-modal-{{id}}" tabindex="-1" role="dialog" aria-labelledby="edit-modal-{{id}}-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title .title" id="edit-modal-{{id}}-label">
+                    <!--<input type="text" class="form-control" value="{{eventTitle}}" placeholder="Event title"/>-->
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <textarea type="text" class="form-control description" placeholder="Event description">{{eventDescription}}</textarea>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control start-dp" value="{{eventStartDate}}" />
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control end-dp" value="{{eventEndDate}}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
