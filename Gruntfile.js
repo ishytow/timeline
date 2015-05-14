@@ -74,6 +74,7 @@ module.exports = function (grunt) {
                 src: [
                     '<%= yeoman.app %>/styles/*.css',
                     '<%= yeoman.app %>/bower_components/bootstrap/dist/css/bootstrap.min.css',
+                    '<%= yeoman.app %>/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
                     '<%= yeoman.app %>/bower_components/vis/dist/vis.min.css'
                 ],
                 dest: '<%= yeoman.dist %>/styles/main.css'

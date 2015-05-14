@@ -7,7 +7,8 @@ define([
     'templates',
     'moment',
     'utils',
-    'EventListener'
+    'EventListener',
+    'bootstrap-datepicker'
 ], function ($, _, Backbone, JST, moment, Utils, EventListener) {
     'use strict';
 
