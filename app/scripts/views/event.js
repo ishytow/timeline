@@ -15,7 +15,9 @@ define([
     var EventView = Backbone.View.extend({
         items: [],
 
-        modalTemplate: JST['app/scripts/templates/event-modal.hbs'],
+        editModalTemplate: JST['app/scripts/templates/event-edit-modal.hbs'],
+        removeModalTemplate: JST['app/scripts/templates/event-remove-modal.hbs'],
+        modalEl: null,
 
         initialize: function () {
             EventListener.get('timeline').on('timeline-created', function(options){
@@ -55,12 +57,15 @@ define([
                         eventId: this.model.get('id'),
                         className: 'event-item-' + this.model.get('id'),
                         userName: this.model.get('userName'),
-                        eventName: this.model.get('eventName'),
+                        eventTitle: this.model.get('eventTitle'),
+                        eventDescription: this.model.get('eventDescription'),
                         eventStartDate: eventStartDate.locale('en').format('MM.DD, HH:mm'),
                         eventEndDate: eventEndDate.locale('en').format('MM.DD, HH:mm'),
                         start: start,
                         end: end,
-                        group: i});
+                        group: i,
+                        subgroup: 'sg-' + this.model.get('id') + '-g-' + i
+                    });
                 }
             }
 
@@ -68,13 +73,13 @@ define([
         },
 
         edit: function(){
-            console.log('edit');
-            $('#modals-container').html(this.modalTemplate(this.model.toJSON()));
-            $('#modals-container #modal-' + this.model.get('id')).modal('show');
+            $('#modals-container').html(this.editModalTemplate(this.model.toJSON()));
+            this.initEditModal();
         },
 
         removeEvent: function(){
-            console.log('remove');
+            $('#modals-container').html(this.removeModalTemplate(this.model.toJSON()));
+            this.initRemoveModal();
         },
 
         initEvents: function(){
@@ -83,8 +88,52 @@ define([
             $(document).off('click', selector + ' .remove').on('click', selector + ' .remove', this.removeEvent.bind(this));
         },
 
-        initModal: function(){
-            console.log($('#modals-container').length);
+        initEditModal: function(){
+            this.editModal = $('#modals-container #edit-modal-' + this.model.get('id'));
+            this.editModal.modal('show');
+            this.editModal.find('.start-dp').datetimepicker({
+                defaultDate: this.model.get('startDate'),
+                locale: 'en',
+                format: 'MMM.DD.YYYY, HH:mm'
+            });
+            this.editModal.find('.end-dp').datetimepicker({
+                defaultDate: this.model.get('endDate'),
+                locale: 'en',
+                format: 'MMM.DD.YYYY, HH:mm',
+                minDate: this.model.get('startDate')
+            });
+
+            this.editModal.find('.start-dp').on("dp.change", function (e) {
+                this.editModal.find('.end-dp').data("DateTimePicker").minDate(e.date);
+            }.bind(this));
+
+            this.editModal.find('.end-dp').on("dp.change", function (e) {
+                this.editModal.find('.start-dp').data("DateTimePicker").maxDate(e.date);
+            }.bind(this));
+
+            this.editModal.find('.save').on('click', function(){
+                var updatedValues = {
+                    title: this.editModal.find('.title'),
+                    description: this.editModal.find('.description'),
+                    startDate: new Date(this.editModal.find('.start-dp').val()),
+                    endDate: new Date(this.editModal.find('.end-dp').val())
+                };
+                this.model.set(updatedValues);
+                this.editModal.modal('hide');
+                //TODO:
+                //this.model.save();
+            }.bind(this));
+        },
+
+        initRemoveModal: function(){
+            this.removeModal = $('#modals-container #remove-modal-' + this.model.get('id'));
+            this.removeModal.modal('show');
+            this.removeModal.find('.remove').on('click', function(){
+                this.removeModal.modal('hide');
+                this.model.trigger('destroy', this.model);
+                //TODO:
+                // this.model.destroy();
+            }.bind(this));
         },
 
         initPopover: function(timeLineEl){
@@ -104,7 +153,6 @@ define([
             });
 
             this.initEvents();
-            this.initModal();
         },
 
         renderItem: function(){

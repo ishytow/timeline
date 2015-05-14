@@ -81,6 +81,8 @@ define(['moment', 'templates'],function(moment, JST){
                     margin: {axis: 10},
                     min: this.getStartScaleDate(),
                     max: this.getEndScaleDate(),
+                    showCurrentTime: false,
+                    stack: false,
                     format: {
                         minorLabels: {
                             minute: 'HH:mm',
@@ -93,6 +95,36 @@ define(['moment', 'templates'],function(moment, JST){
                     onMoving: this.onMoving,
                     onRemove: this.onRemove
                 };
+            },
+
+
+            getMockedEvents: function(){
+                var events = [];
+                var offset =  this.getOffset();
+
+                for (var i = 1; i <= this.getDays().length; i++) {
+                    var id = i+offset;
+
+                    var startItemTime = new Date();
+                    startItemTime.setDate(startItemTime.getDate() + i);
+                    startItemTime.setHours(id+2,0,0,0);
+
+                    var endItemTime = new Date();
+                    endItemTime.setDate(endItemTime.getDate() + i);
+                    endItemTime.setHours(id+8,0,0,0);
+
+                    events.push({
+                        id: 'event-id-' + id,
+                        userId: 'uid-'+ id,
+                        startDate: startItemTime,
+                        endDate: endItemTime,
+                        userName: 'User name #' + id,
+                        eventTitle: 'Event title #' + id,
+                        eventDescription: 'Awesome description of awesome event with number ' + id
+                    });
+                }
+
+                return events
             }
         }
     };

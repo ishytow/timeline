@@ -25,7 +25,6 @@ define([
 
         initialize: function (options) {
             this.setTimelineOptions(options);
-
         },
 
         setTimelineOptions: function(options){
@@ -60,6 +59,7 @@ define([
             this.timeline.setOptions(this.options);
             this.timeline.setGroups(this.groups);
             this.timeline.setItems(this.items);
+
             this.timeline.on('select', function (options) {
                 this.timeline.setSelection([]);
                 if(options && options.items) {
