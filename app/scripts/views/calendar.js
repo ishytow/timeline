@@ -21,7 +21,8 @@ define([
         template: JST['app/scripts/templates/calendar.hbs'],
         contextMenuTemplates: {
             onTimeline: JST['app/scripts/templates/timelineMenu.hbs'],
-            onItem: JST['app/scripts/templates/itemMenu.hbs']
+            onItem: JST['app/scripts/templates/itemMenu.hbs'],
+            default: JST['app/scripts/templates/defaultMenu.hbs']
         },
         timelineView: null,
         eventsCollection: null,
@@ -122,24 +123,20 @@ define([
             }
         },
 
-        onContextMenu: function(properties){
-            var getMenuPosition = function(mouse, direction, scrollDir) {
-                var win = $(window)[direction]();
-                var scroll = $(window)[scrollDir]();
-                var menu = $('#context-menu')[direction]();
-                var position = mouse + scroll;
-                if (mouse + menu > win && menu < mouse){
-                    position -= menu;
-                }
-                return position;
-            };
+        onTimelineContextMenu: function(properties){
             if(properties){
                 if (properties.event.ctrlKey) return;
                 properties.event.preventDefault();
-                if(properties.item === null){
-                    $('#context-menu').html(this.contextMenuTemplates.onTimeline());
-                }else{
-                    $('#context-menu').html(this.contextMenuTemplates.onItem());
+                switch (properties.what) {
+                    case 'background':
+                        this.contextMenu.html(this.contextMenuTemplates.onTimeline());
+                        break;
+                    case 'item':
+                        this.contextMenu.html(this.contextMenuTemplates.onItem());
+                        break;
+                    default :
+                        this.contextMenu.html(this.contextMenuTemplates.default());
+                        break;
                 }
 
                 this.contextMenu.css({
@@ -205,6 +202,7 @@ define([
             });
             this.$el.find(".timeline-scale-range .slider").Link('upper').to('-inline-<div class="range-tooltip tooltip top" role="tooltip"></div>', updateUpperTooltip);
             this.$el.find(".timeline-scale-range .slider").Link('lower').to('-inline-<div class="range-tooltip tooltip top" role="tooltip"></div>', updateLowerTooltip);
+
             this.$el.find(".timeline-scale-range .save").on('click', function(){
                 var sliderValue = this.$el.find('.timeline-scale-range .slider').val();
                 var startTimeMinutes = sliderValue[0].substring(0, sliderValue[0].indexOf('.'));
@@ -247,7 +245,7 @@ define([
             this.$el.find('.timeline-container').html(this.renderTimeline().$el);
             this.$el.find('.timeline-container').on('mousewheel', this.onMouseWheel.bind(this));
             this.timelineView.timeline.on('doubleClick', this.onDoubleClick.bind(this));
-            this.timelineView.timeline.on('contextmenu', this.onContextMenu.bind(this));
+            this.timelineView.timeline.on('contextmenu', this.onTimelineContextMenu.bind(this));
             $(document).on('click', function(e){
                 if($(e.target).parents(this.tabItemSelector).length === 0
                     && !$(e.target).is(this.tabItemSelector)

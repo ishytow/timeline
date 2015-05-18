@@ -15,6 +15,8 @@ define([
     var CalendarsView = Backbone.View.extend({
         template: JST['app/scripts/templates/calendars.hbs'],
         tabItemTemplate: JST['app/scripts/templates/calendar-tab-item.hbs'],
+        calendarMenuTemplate: JST['app/scripts/templates/calendar-menu.hbs'],
+        calendarMenuDefaultTemplate: JST['app/scripts/templates/calendar-menu-default.hbs'],
         tagName: 'div',
 
         onTabSoreted: function(e, ui){
@@ -24,6 +26,37 @@ define([
             }.bind(this));
             //TODO:
             //this.collection.update();
+        },
+
+        onCalendarContextMenu: function(e){
+            e.preventDefault();
+            var target = $(e.target);
+            if(target.hasClass('glyphicon-plus')){
+                return false;
+            }
+            if(target.hasClass('calendar-tab-item')){
+                this.contextMenu.html(this.calendarMenuTemplate());
+            }else{
+                this.contextMenu.html(this.calendarMenuTemplate());
+            }
+            this.contextMenu.css({
+                display: 'block',
+                position: 'absolute',
+                left: e.pageX + 'px',
+                top: e.pageY + 'px'
+            }).off('click');
+            this.contextMenu.find('.add-calendar').on('click', function(){
+                this.onAddCalendar();
+            }.bind(this));
+            this.contextMenu.find('.edit-calendar').on('click', function(){
+                EventListener.get('timeline').trigger('edit-calendar-'+ target.data('uuid'));
+            });
+            this.contextMenu.find('.remove-calendar').on('click', function(){
+
+            });
+            this.contextMenu.find('.change-scale').on('click', function(){
+
+            });
         },
 
         renderCalendar: function(calendar){
@@ -39,8 +72,15 @@ define([
             });
         },
 
+        onAddCalendar: function(){
+            var calendarModel = new CalendarModel();
+            this.collection.add(calendarModel);
+            this.renderCalendar(calendarModel);
+            this.addDblClickHendler();
+        },
         render: function () {
             this.$el.html(this.template());
+            this.contextMenu = $('#context-menu');
             this.collection.each(function(calendar){
                 this.renderCalendar(calendar);
             }, this);
@@ -57,12 +97,8 @@ define([
             });
             this.$el.find('.calendars-tabs').disableSelection();
             this.addDblClickHendler();
-            this.$el.find('.calendars-tabs .add-calendar').on('click', function(){
-                var calendarModel = new CalendarModel();
-                this.collection.add(calendarModel);
-                this.renderCalendar(calendarModel);
-                this.addDblClickHendler();
-            }.bind(this));
+            this.$el.find('.calendars-tabs .add-calendar').on('click', this.onAddCalendar.bind(this));
+            this.$el.find('.calendars-tabs').on('contextmenu', this.onCalendarContextMenu.bind(this));
             return this;
         }
     });
