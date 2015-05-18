@@ -1,20 +1,106 @@
-body {
-  background: #fafafa;
-}
-.hero-unit {
-  margin: 50px auto 0 auto;
-  width: 300px;
-}
-.group {
-  min-height: 47px;
-}
 div.vispanel.center {
   z-index: 1000;
 }
-#timeline-container {
+.timeline-container {
   overflow: hidden;
   min-height: 360px;
+  border-radius: 0px 0px 10px 10px;
+  -moz-border-radius: 0px 0px 10px 10px;
+  -webkit-border-radius: 0px 0px 10px 10px;
+  border: 1px solid #df691a;
+}
+.noUi-connect {
+  background: #3fb8af;
+}
+.calendar-tab-item {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.add-calendar-btn {
+  margin-top: 8px;
+  margin-left: 5px;
+}
+.calendar-title-edit {
+  margin-bottom: 0;
+}
+.tab-item {
+  width: 170px;
+}
+.vis.timeline .timeaxis .text {
+  color: #ffffff;
+}
+.vis.timeline.root {
+  border: none;
+}
+.vis.timeline .group {
+  min-height: 47px;
+}
+.vis.timeline .timeaxis .grid.minor {
+  border-color: #df691a;
+}
+.vis.timeline .vispanel.bottom,
+.vis.timeline .vispanel.center,
+.vis.timeline .vispanel.left,
+.vis.timeline .vispanel.right,
+.vis.timeline .vispanel.top {
+  border-color: #df691a;
+}
+.vis.timeline .vispanel.center {
+  z-index: 1000;
+}
+.vis.timeline .labelset .vlabel {
+  color: #ffffff;
+  border-bottom: 1px solid #df691a;
+}
+.vis.timeline .foreground .group {
+  border-bottom: 1px solid #df691a;
+}
+.vis.timeline .item {
+  font-size: 14px;
+  color: #ffffff;
+  border-color: #97b0f8;
+  background-color: #7394d6;
+}
+.vis.timeline .item.selected {
+  color: #15429a;
+  border-color: #ffb836;
+  background-color: #ffb836;
 }
 .modal-dialog {
   margin: 85px auto !important;
+}
+.popover {
+  max-width: 100% !important;
+}
+.timeline-scale-range-container {
+  display: none;
+  border: 1px solid #df691a;
+  border-bottom: none;
+  padding: 40px 0 10px 85px;
+}
+.timeline-scale-range-container .timeline-scale-range .slider {
+  margin: auto 10px;
+}
+.timeline-scale-range-container .timeline-scale-range .slider .range-tooltip {
+  opacity: 1;
+  display: block;
+  position: absolute;
+  top: -32px;
+  padding: 5px;
+  left: -41px;
+  text-align: center;
+  width: 90px;
+}
+.noUi-horizontal {
+  height: 10px !important;
+}
+.noUi-handle {
+  width: 10px !important;
+  height: 20px !important;
+  left: 0 !important;
+}
+.noUi-handle:after,
+.noUi-handle:before {
+  display: none;
 }

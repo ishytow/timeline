@@ -12,13 +12,13 @@ define([
         },
 
         routes: {
-            '': 'timeLinePage'
+            '': 'calendarsPage'
         },
 
-        timeLinePage: function(){
-            require(['views/timeline-page'], function(TimelinePageView){
-                var pageView = new TimelinePageView();
-                $('#main').html(pageView.render().$el);
+        calendarsPage: function(){
+            require(['views/calendarsPage'], function(CalendarsPage){
+                var calendarsPage = new CalendarsPage();
+                $('#main').html(calendarsPage.render().$el);
             });
         }
     });

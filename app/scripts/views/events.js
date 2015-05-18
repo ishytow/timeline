@@ -4,18 +4,18 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'views/event',
+    'views/event'
 ], function ($, _, Backbone, Event) {
     'use strict';
 
     var EventsView = Backbone.View.extend({
         items: [],
 
-        renderItems: function(){
+        renderItems: function(calendar){
             this.items = [];
             this.collection.each(function(event){
                 var eventView = new Event({model: event});
-                var eventItems = eventView.renderItem().items;
+                var eventItems = eventView.renderItem(calendar).items;
                 $.merge(this.items, eventItems);
             }.bind(this), this);
 

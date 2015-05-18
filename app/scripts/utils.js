@@ -3,9 +3,11 @@ define(['moment', 'templates'],function(moment, JST){
 
     var initUtils = function(){
         utils = {
+            calendars: [],
             config: {
                 week: 0,
                 daysCount: 7,
+                defaultEventTimeStep: 2,
                 dates: {
                     startTime: {
                         hours: 0,
@@ -16,6 +18,16 @@ define(['moment', 'templates'],function(moment, JST){
                         minutes: 0
                     }
                 }
+            },
+
+            getUuid: function(){
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+                }
+                return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                    s4() + '-' + s4() + s4() + s4();
             },
             getWeek: function(){
                 return this.config.week;
@@ -34,7 +46,13 @@ define(['moment', 'templates'],function(moment, JST){
                 var days = this.getDays();
                 var groups = [];
                 for (var i = 0; i < days.length; i++) {
-                    groups.push({id: i, content: days[i].format('ddd, DD.MM'), className: 'tileline-group-' + i, style: 'min-height: 47px;'});
+                    groups.push({
+                        id: i,
+                        content: days[i].format('ddd, DD.MM'),
+                        className: 'tileline-group-' + i,
+                        style: 'min-height: 47px; width: 85px;',
+                        day: days[i]
+                    });
                 }
                 return groups;
             },
@@ -49,18 +67,27 @@ define(['moment', 'templates'],function(moment, JST){
                 return days;
             },
 
-            getStartScaleDate: function(timeOptions){
-                var startTime = moment().toDate();
+            getStartScaleDate: function(calendar){
+                var startTime = moment();
+                var timeOptions = (calendar && calendar.get('startTime') && $.isPlainObject(calendar.get('startTime'))) ? calendar.get('startTime') : {};
                 var time = $.extend({}, this.config.dates.startTime, timeOptions);
-                startTime.setHours(time.hours, time.minutes, 0, 0);
+                startTime.hour(time.hours).minute(time.minutes).second(0);
                 return startTime;
             },
 
-            getEndScaleDate: function(timeOptions){
-                var endTime = moment().toDate();
+            setStartScaleDate: function(timeOptions){
+                $.extend(this.config.dates.startTime, timeOptions);
+            },
+
+            getEndScaleDate: function(calendar){
+                var endTime = moment();
+                var timeOptions = (calendar && calendar.get('endTime') && $.isPlainObject(calendar.get('endTime'))) ? calendar.get('endTime') : {};
                 var time = $.extend({}, this.config.dates.endTime, timeOptions);
-                endTime.setHours(time.hours, time.minutes, 0, 0);
-                return endTime;
+                return endTime.hour(time.hours).minute(time.minutes).second(0);
+            },
+
+            setEndScaleDate: function(timeOptions){
+                $.extend(this.config.dates.startTime, endTime);
             },
 
             getItemTemplate: function(item){
@@ -68,19 +95,28 @@ define(['moment', 'templates'],function(moment, JST){
                 return template(item);
             },
 
-            getTimelineOptions: function(){
+            getNewEventDefaultDates: function(groupDay, snappedTime){
+                var mSnappedTime = moment(snappedTime);
+                var date = groupDay.clone();
+                return {
+                    startDate: date.hour(mSnappedTime.hour()).minute(mSnappedTime.minute()).second(0),
+                    endDate: date.clone().add(this.config.defaultEventTimeStep, 'hours')
+                }
+            },
+
+            getTimelineOptions: function(calendar){
                 return {
                     orientation: 'top',
                     template: this.getItemTemplate,
                     zoomable: false,
                     editable: false,
                     showMajorLabels: false,
-                    start: this.getStartScaleDate(),
-                    end: this.getEndScaleDate(),
+                    start: this.getStartScaleDate(calendar),
+                    end: this.getEndScaleDate(calendar),
                     timeAxis: {scale: 'hour', step: 2},
                     margin: {axis: 10},
-                    min: this.getStartScaleDate(),
-                    max: this.getEndScaleDate(),
+                    min: this.getStartScaleDate(calendar),
+                    max: this.getEndScaleDate(calendar),
                     showCurrentTime: false,
                     stack: false,
                     format: {
@@ -97,8 +133,11 @@ define(['moment', 'templates'],function(moment, JST){
                 };
             },
 
+            getEventIdByItemId: function(itemId){
+                return itemId.substr(0, itemId.indexOf('-g-'));
+            },
 
-            getMockedEvents: function(){
+            getMockedEvents: function(calendar){
                 var events = [];
                 var offset =  this.getOffset();
 
@@ -107,24 +146,47 @@ define(['moment', 'templates'],function(moment, JST){
 
                     var startItemTime = new Date();
                     startItemTime.setDate(startItemTime.getDate() + i);
-                    startItemTime.setHours(id+2,0,0,0);
+                    startItemTime.setHours(id+4,0,0,0);
 
                     var endItemTime = new Date();
                     endItemTime.setDate(endItemTime.getDate() + i);
                     endItemTime.setHours(id+8,0,0,0);
 
+                    var uuid = this.getUuid();
+
                     events.push({
-                        id: 'event-id-' + id,
-                        userId: 'uid-'+ id,
+                        uuid: uuid,
+                        assignTo: 'assignTo-' + id,
+                        calendarId: 'calendar-id-' + calendar.get('uuid'),
                         startDate: startItemTime,
                         endDate: endItemTime,
-                        userName: 'User name #' + id,
-                        eventTitle: 'Event title #' + id,
-                        eventDescription: 'Awesome description of awesome event with number ' + id
+                        title: 'Event title #' + uuid.substr(0, 4),
+                        description: 'Awesome description of awesome event with uuid ' + uuid
                     });
                 }
 
                 return events
+            },
+            getMockedCalendars: function(){
+                var calendars = [];
+                for (var i = 0; i <= 3; i++) {
+                    var uuid = this.getUuid();
+
+                    calendars.push({
+                        uuid: uuid,
+                        title: 'Cal ' + i,
+                        startTime: {
+                            hours: i,
+                            minutes: 0
+                        },
+                        endTime: {
+                            hours: 24 - i,
+                            minutes: 0
+                        }
+                    });
+                }
+
+                return calendars
             }
         }
     };

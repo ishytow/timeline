@@ -1,14 +1,14 @@
-<div data-item-id="{{id}}" data-event-id="{{eventId}}" class="event-item-content text-center">
-    <div class="popover-trigger"><b>{{eventTitle}}</b> : {{userName}}</div>
+<div data-item-id="{{id}}" data-event-id="{{uuid}}" class="event-item-content text-center">
+    <div class="popover-trigger"><b>{{eventTitle}}</b> : {{assignTo}}</div>
     <div class="popover-header hide">
         <b>{{eventTitle}}</b>
     </div>
     <div class="popover-content hide">
-        <div class="event-id-{{eventId}}">
+        <div class="event-uuid-{{uuid}}">
             <div class="display-mode">
-                <div>{{eventStartDate}} - {{eventEndDate}}</div>
+                <div><b>{{startDate}}</b> - <b>{{endDate}}</b></div>
                 <div>
-                    <h5>{{userName}}</h5>
+                    <h5>{{assignedTo}}</h5>
                 </div>
                 <div class="text-right">
                     <span class="glyphicon glyphicon-pencil edit"></span>

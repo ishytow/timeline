@@ -25,13 +25,13 @@ define([
             }.bind(this));
         },
 
-        getItemsByEvent: function(){
+        getItemsByEvent: function(calendar){
             var items = [];
             var days = Utils.getDays();
             var eventStartDate = moment(this.model.get('startDate'));
             var eventEndDate = moment(this.model.get('endDate'));
-            var startScaleDate = moment(Utils.getStartScaleDate());
-            var endScaleDate = moment(Utils.getEndScaleDate());
+            var startScaleDate = moment(Utils.getStartScaleDate(calendar));
+            var endScaleDate = moment(Utils.getEndScaleDate(calendar));
             var lastDate = days[days.length - 1].clone();
 
             for (var i = 0; i < days.length; i++) {
@@ -53,18 +53,18 @@ define([
 
                 if(start !== null && end !== null){
                     items.push({
-                        id: this.model.get('id') + '-g-' + i,
-                        eventId: this.model.get('id'),
-                        className: 'event-item-' + this.model.get('id'),
-                        userName: this.model.get('userName'),
-                        eventTitle: this.model.get('eventTitle'),
-                        eventDescription: this.model.get('eventDescription'),
-                        eventStartDate: eventStartDate.locale('en').format('MM.DD, HH:mm'),
-                        eventEndDate: eventEndDate.locale('en').format('MM.DD, HH:mm'),
+                        id: this.model.get('uuid') + '-g-' + i,
+                        uuid: this.model.get('uuid'),
+                        className: 'event-item-' + this.model.get('uuid'),
+                        assignTo: this.model.get('assignTo'),
+                        eventTitle: this.model.get('title'),
+                        description: this.model.get('description'),
+                        startDate: eventStartDate.locale('en').format('MM.DD, HH:mm'),
+                        endDate: eventEndDate.locale('en').format('MM.DD, HH:mm'),
                         start: start,
                         end: end,
                         group: i,
-                        subgroup: 'sg-' + this.model.get('id') + '-g-' + i
+                        subgroup: 'sg-' + this.model.get('uuid') + '-g-' + i
                     });
                 }
             }
@@ -73,33 +73,47 @@ define([
         },
 
         edit: function(){
-            $('#modals-container').html(this.editModalTemplate(this.model.toJSON()));
-            this.initEditModal();
+            this.renderEditModal();
         },
 
         removeEvent: function(){
-            $('#modals-container').html(this.removeModalTemplate(this.model.toJSON()));
-            this.initRemoveModal();
+            this.renderRemoveModal();
         },
+
+        isEventInitialized: false,
 
         initEvents: function(){
-            var selector = '.popover-content .event-id-' + this.model.get('id');
-            $(document).off('click', selector + ' .edit').on('click', selector + ' .edit', this.edit.bind(this));
-            $(document).off('click', selector + ' .remove').on('click', selector + ' .remove', this.removeEvent.bind(this));
+            if(this.isEventInitialized === false){
+                var selector = '.popover-content .event-uuid-' + this.model.get('uuid');
+                $(document).off('click', selector + ' .edit').on('click', selector + ' .edit', this.edit.bind(this));
+                $(document).off('click', selector + ' .remove').on('click', selector + ' .remove', this.removeEvent.bind(this));
+                EventListener.get('timeline')
+                    .off('edit-event-' + this.model.get('uuid'))
+                    .on('edit-event-' + this.model.get('uuid'), function(){
+                        this.edit();
+                }.bind(this));
+                EventListener.get('timeline')
+                    .off('remove-event-' + this.model.get('uuid'))
+                    .on('remove-event-' + this.model.get('uuid'), function(){
+                        this.removeEvent();
+                }.bind(this));
+                this.isEventInitialized = true;
+            }
         },
 
-        initEditModal: function(){
-            this.editModal = $('#modals-container #edit-modal-' + this.model.get('id'));
+        renderEditModal: function(){
+            $('#modals-container').html(this.editModalTemplate(this.model.toJSON()));
+            this.editModal = $('#modals-container #edit-modal-' + this.model.get('uuid'));
             this.editModal.modal('show');
             this.editModal.find('.start-dp').datetimepicker({
                 defaultDate: this.model.get('startDate'),
                 locale: 'en',
-                format: 'MMM.DD.YYYY, HH:mm'
+                format: 'MMM DD, HH:mm'
             });
             this.editModal.find('.end-dp').datetimepicker({
                 defaultDate: this.model.get('endDate'),
                 locale: 'en',
-                format: 'MMM.DD.YYYY, HH:mm',
+                format: 'MMM DD, HH:mm',
                 minDate: this.model.get('startDate')
             });
 
@@ -107,26 +121,25 @@ define([
                 this.editModal.find('.end-dp').data("DateTimePicker").minDate(e.date);
             }.bind(this));
 
-            this.editModal.find('.end-dp').on("dp.change", function (e) {
-                this.editModal.find('.start-dp').data("DateTimePicker").maxDate(e.date);
-            }.bind(this));
-
             this.editModal.find('.save').on('click', function(){
                 var updatedValues = {
-                    title: this.editModal.find('.title'),
-                    description: this.editModal.find('.description'),
-                    startDate: new Date(this.editModal.find('.start-dp').val()),
-                    endDate: new Date(this.editModal.find('.end-dp').val())
+                    title: this.editModal.find('.title').val(),
+                    description: this.editModal.find('.description').val(),
+                    startDate: moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm').toDate().getTime(),
+                    endDate: moment(this.editModal.find('.end-dp').val(), 'MMM DD, HH:mm').toDate().getTime()
                 };
+                console.log(moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm'));
                 this.model.set(updatedValues);
+                console.log(this.model);
                 this.editModal.modal('hide');
                 //TODO:
                 //this.model.save();
             }.bind(this));
         },
 
-        initRemoveModal: function(){
-            this.removeModal = $('#modals-container #remove-modal-' + this.model.get('id'));
+        renderRemoveModal: function(){
+            $('#modals-container').html(this.removeModalTemplate(this.model.toJSON()));
+            this.removeModal = $('#modals-container #remove-modal-' + this.model.get('uuid'));
             this.removeModal.modal('show');
             this.removeModal.find('.remove').on('click', function(){
                 this.removeModal.modal('hide');
@@ -138,7 +151,7 @@ define([
 
         initPopover: function(timeLineEl){
             var _this = this;
-            this.$el = timeLineEl.find('.event-item-' + this.model.get('id'));
+            this.$el = timeLineEl.find('.event-item-' + this.model.get('uuid'));
             this.$el.popover({
                 html : true,
                 title: function() {
@@ -155,8 +168,8 @@ define([
             this.initEvents();
         },
 
-        renderItem: function(){
-            this.items = this.getItemsByEvent(this.days);
+        renderItem: function(calendar){
+            this.items = this.getItemsByEvent(calendar);
             return this;
         }
     });

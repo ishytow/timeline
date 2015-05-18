@@ -72,10 +72,11 @@ module.exports = function (grunt) {
             },
             dist: {
                 src: [
-                    '<%= yeoman.app %>/styles/*.css',
-                    '<%= yeoman.app %>/bower_components/bootstrap/dist/css/bootstrap.min.css',
+                    '<%= yeoman.app %>/bower_components/bootswatch/superhero/bootstrap.min.css',
                     '<%= yeoman.app %>/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
-                    '<%= yeoman.app %>/bower_components/vis/dist/vis.min.css'
+                    '<%= yeoman.app %>/bower_components/vis/dist/vis.css',
+                    '<%= yeoman.app %>/bower_components/nouislider/distribute/jquery.nouislider.min.css',
+                    '<%= yeoman.app %>/styles/*.css'
                 ],
                 dest: '<%= yeoman.dist %>/styles/main.css'
             }

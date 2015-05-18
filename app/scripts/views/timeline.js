@@ -16,40 +16,38 @@ define([
         template: JST['app/scripts/templates/timeline.hbs'],
 
         tagName: 'div',
-
-        id: 'timeline',
-
         items: [],
-
+        calendar: null,
         timeline: null,
 
         initialize: function (options) {
+            this.calendar = options.calendar;
             this.setTimelineOptions(options);
         },
 
         setTimelineOptions: function(options){
             this.items = new vis.DataSet(options.items);
             this.groups = new vis.DataSet(Utils.getGroups());
-            this.options = Utils.getTimelineOptions();
         },
 
         initPopovers: function(){
             EventListener.get('timeline').trigger('timeline-created', {timeLineEl: this.$el});
-            var $popoverEls = this.$el.find('.popover-trigger').parents('.item[class*="event-item-"]');
-            $popoverEls.click(function(){
-                $popoverEls.not(this).popover('hide');
+            var popoversSelectors = this.$el.find('.popover-trigger').parents('.item[class*="event-item-"]');
+            popoversSelectors.click(function(){
+                popoversSelectors.not(this).popover('hide');
             });
             $(document).on('click', function (e) {
                 if ((!$(e.target).is('.item[class*="event-item-"]')
                     && $(e.target).parents('.item[class*="event-item-"]').length === 0
                     && $(e.target).parents('.popover.in').length === 0)
                     || $(e.target).is('.display-mode .edit, .display-mode .remove')) {
-                    $popoverEls.popover('hide');
+                    popoversSelectors.popover('hide');
                 }
             });
         },
 
         initTimeline: function(){
+            this.options = Utils.getTimelineOptions(this.calendar);
             if(this.timeline !== null){
                 this.timeline.clear();
             }else{
@@ -59,12 +57,13 @@ define([
             this.timeline.setOptions(this.options);
             this.timeline.setGroups(this.groups);
             this.timeline.setItems(this.items);
+            //console.log(this.items);
 
             this.timeline.on('select', function (options) {
                 this.timeline.setSelection([]);
                 if(options && options.items) {
                     _.each(options.items, function (itemId) {
-                        var selectedId = itemId.substr(0, itemId.indexOf('-g-'));
+                        var selectedId = Utils.getEventIdByItemId(itemId);
                         var itemsById = [];
                         for (var i = 0; i < this.groups.length; i++){
                             itemsById.push(selectedId + '-g-' + i);
@@ -77,10 +76,10 @@ define([
         },
 
         renderTimeline: function(options){
-            this.$el.parent('#timeline-container').height(this.$el.height());
+            this.$el.parent('.timeline-container').height(this.$el.height());
             if(options && options.scrollDirection){
                 var animationParams;
-                if(options.scrollDirection === 'up'){
+                if(options.scrollDirection === 'prev'){
                     animationParams = {
                         marginTop: '+=1500px',
                         marginTopReverse: '-=3000px'
@@ -95,25 +94,29 @@ define([
                     this.initTimeline();
                     this.$el.css('marginTop', animationParams.marginTopReverse)
                         .animate({'marginTop' : '0px', 'opacity': 1},200,function(){
-                            this.$el.parent('#timeline-container').animate({'height' : this.$el.height() + 'px'},200,function(){
-                                this.$el.parent('#timeline-container').height(this.$el.height());
+                            this.$el.parent('.timeline-container').animate({'height' : this.$el.height() + 'px'},200,function(){
+                                this.$el.parent('.timeline-container').height(this.$el.height());
                             }.bind(this));
                         }.bind(this));
                 }.bind(this));
             }else{
-                this.$el.hide(function(){
+                this.$el.fadeOut(500, function(){
                     this.initTimeline();
-                    this.$el.fadeIn(1000);
+                    this.$el.parent('.timeline-container').animate({'height' : this.$el.height() + 'px'},200,function(){
+                        this.$el.parent('.timeline-container').height(this.$el.height());
+                    }.bind(this));
+                    this.$el.fadeIn(500);
                 }.bind(this));
             }
         },
 
         updateTimeline: function(options){
+            console.log(1);
             this.renderTimeline(options);
         },
 
         render: function () {
-            this.$el.html(this.template());
+            this.$el.html(this.template()).attr('id', 'timeline-' + this.calendar.get('uuid'));
             this.renderTimeline();
             return this;
         }

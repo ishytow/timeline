@@ -3,23 +3,34 @@
 define([
     'underscore',
     'backbone',
-    'collections/comments'
-], function (_, Backbone, CommentsCollection) {
+    'collections/comments',
+    'moment',
+    'utils'
+], function (_, Backbone, CommentsCollection, moment, Utils) {
     'use strict';
 
     var EventModel = Backbone.Model.extend({
         url: '',
 
+        idAttribute: 'uuid',
+
         initialize: function() {
+
         },
 
-        defaults: {
-            id: '',
-            userId: '',
-            startDate: '',
-            endDate: '',
-            title: '',
-            comments: new CommentsCollection()
+        defaults: function(){
+            return {
+                uuid: Utils.getUuid(),
+                title: "Default title",
+                description: "Default description",
+                startDate: moment().toDate().getTime(),
+                endDate: moment().add(2, 'hour').toDate().getTime(),
+                assignTo: '',
+                createdBy: '',
+                calendarId: '',
+                modRequest: '',
+                conversationId: ''
+            }
         },
 
         validate: function(attrs, options) {
