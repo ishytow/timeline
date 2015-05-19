@@ -7,7 +7,7 @@ define(['moment', 'templates'],function(moment, JST){
             config: {
                 week: 0,
                 daysCount: 7,
-                defaultEventTimeStep: 2,
+                defaultEventTimeStep: 0.25,
                 dates: {
                     startTime: {
                         hours: 0,

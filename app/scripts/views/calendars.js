@@ -37,7 +37,7 @@ define([
             if(target.hasClass('calendar-tab-item')){
                 this.contextMenu.html(this.calendarMenuTemplate());
             }else{
-                this.contextMenu.html(this.calendarMenuTemplate());
+                this.contextMenu.html(this.calendarMenuDefaultTemplate());
             }
             this.contextMenu.css({
                 display: 'block',
@@ -46,16 +46,19 @@ define([
                 top: e.pageY + 'px'
             }).off('click');
             this.contextMenu.find('.add-calendar').on('click', function(){
-                this.onAddCalendar();
+                this.addCalendar();
             }.bind(this));
             this.contextMenu.find('.edit-calendar').on('click', function(){
+                target.tab('show');
                 EventListener.get('timeline').trigger('edit-calendar-'+ target.data('uuid'));
             });
             this.contextMenu.find('.remove-calendar').on('click', function(){
-
-            });
+                target.tab('show');
+                this.removeCalendar(target);
+            }.bind(this));
             this.contextMenu.find('.change-scale').on('click', function(){
-
+                target.tab('show');
+                EventListener.get('timeline').trigger('change-scale-'+ target.data('uuid'));
             });
         },
 
@@ -64,6 +67,7 @@ define([
             $(tabItem).insertBefore(this.$el.find('.calendars-tabs .add-calendar'));
             var calendarView = new CalendarView({model : calendar, tabItem: $(tabItem)});
             this.$el.find('.tab-content').append(calendarView.render().$el);
+            return $(tabItem);
         },
 
         addDblClickHendler: function(){
@@ -72,12 +76,28 @@ define([
             });
         },
 
-        onAddCalendar: function(){
+        addCalendar: function(){
             var calendarModel = new CalendarModel();
+            //TODO:
+            //calendarModel.save();
             this.collection.add(calendarModel);
             this.renderCalendar(calendarModel);
             this.addDblClickHendler();
+            EventListener.get('timeline').trigger('edit-calendar-'+ calendarModel.get('uuid'));
         },
+
+        removeCalendar: function(target){
+            var calendarModel = this.collection.get(target.data('uuid'));
+            this.collection.remove(calendarModel);
+            console.log(target.parent('.tab-item').hasClass('active'));
+            if(target.parent('.tab-item').hasClass('active') && target.parent('.tab-item').prev().length > 0){
+                target.parent('.tab-item').prev().find('a.calendar-tab-item').tab('show');
+            }
+            target.parent('.tab-item').remove();
+            //TODO:
+            //calendarModel.destroy();
+        },
+
         render: function () {
             this.$el.html(this.template());
             this.contextMenu = $('#context-menu');
@@ -97,7 +117,7 @@ define([
             });
             this.$el.find('.calendars-tabs').disableSelection();
             this.addDblClickHendler();
-            this.$el.find('.calendars-tabs .add-calendar').on('click', this.onAddCalendar.bind(this));
+            this.$el.find('.calendars-tabs .add-calendar').on('click', this.addCalendar.bind(this));
             this.$el.find('.calendars-tabs').on('contextmenu', this.onCalendarContextMenu.bind(this));
             return this;
         }

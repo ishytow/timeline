@@ -35,6 +35,7 @@ define([
         },
 
         initialize: function(options){
+            this.model.bind('remove', this.remove, this);
             this.eventsCollection = new EventsCollection();
             this.eventsView = new EventsView({collection: this.eventsCollection});
             this.listenTo(this.eventsCollection, "change", this.onEventChange);
@@ -221,10 +222,11 @@ define([
         },
 
         onTabEdit: function(){
-            $(this.tabItemSelector).find('.calendar-tab-item').slideUp();
-            $(this.tabItemSelector).find('.calendar-title-edit').slideDown();
-            $(this.tabItemSelector).find('.calendar-title-edit input').focus();
-            this.isTitleEdit = true;
+            $(this.tabItemSelector).find('.calendar-tab-item').slideUp(1000);
+            $(this.tabItemSelector).find('.calendar-title-edit').slideDown(1000, function(){
+                $(this.tabItemSelector).find('.calendar-title-edit input').focus();
+                this.isTitleEdit = true;
+            }.bind(this));
         },
 
         onTabEditFinish: function(){
@@ -254,8 +256,16 @@ define([
                 }
                 this.contextMenu.hide();
             }.bind(this));
+            $(document).keypress(function(e) {
+                if(e.which == 13) {
+                    console.log(e);
+                    console.log($(e.target).parents(this.tabItemSelector).length);
+                    console.log($(e.target).parents(!$(e.target).is(this.tabItemSelector)));
+                }
+            }.bind(this));
             this.renderScaleRange();
-            EventListener.get('timeline').on('edit-calendar-'+this.model.get('uuid'), this.onTabEdit.bind(this));
+            EventListener.get('timeline').on('edit-calendar-' + this.model.get('uuid'), this.onTabEdit.bind(this));
+            EventListener.get('timeline').on('change-scale-' + this.model.get('uuid'), this.onChangeScale.bind(this));
             return this;
         }
     });
