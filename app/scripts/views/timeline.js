@@ -57,7 +57,6 @@ define([
             this.timeline.setOptions(this.options);
             this.timeline.setGroups(this.groups);
             this.timeline.setItems(this.items);
-            //console.log(this.items);
 
             this.timeline.on('select', function (options) {
                 this.timeline.setSelection([]);
@@ -111,7 +110,6 @@ define([
         },
 
         updateTimeline: function(options){
-            console.log(1);
             this.renderTimeline(options);
         },
 

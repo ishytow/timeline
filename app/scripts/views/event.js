@@ -125,12 +125,11 @@ define([
                 var updatedValues = {
                     title: this.editModal.find('.title').val(),
                     description: this.editModal.find('.description').val(),
-                    startDate: moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm').toDate().getTime(),
-                    endDate: moment(this.editModal.find('.end-dp').val(), 'MMM DD, HH:mm').toDate().getTime()
+                    startDate: moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm', 'en').toDate().getTime(),
+                    endDate: moment(this.editModal.find('.end-dp').val(), 'MMM DD, HH:mm', 'en').toDate().getTime()
                 };
-                console.log(moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm'));
+                console.log(moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm', 'en'));
                 this.model.set(updatedValues);
-                console.log(this.model);
                 this.editModal.modal('hide');
                 //TODO:
                 //this.model.save();
@@ -155,10 +154,10 @@ define([
             this.$el.popover({
                 html : true,
                 title: function() {
-                    return $(this).parent().find('.popover-header').html();
+                    return $(this).find('.popover-header').html();
                 },
                 content: function() {
-                    return $(this).parent().find('.popover-content').html();
+                    return $(this).find('.popover-content').html();
                 },
                 trigger: 'click',
                 container: 'body',

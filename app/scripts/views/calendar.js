@@ -258,9 +258,10 @@ define([
             }.bind(this));
             $(document).keypress(function(e) {
                 if(e.which == 13) {
-                    console.log(e);
-                    console.log($(e.target).parents(this.tabItemSelector).length);
-                    console.log($(e.target).parents(!$(e.target).is(this.tabItemSelector)));
+                    if($(e.target).parents(this.tabItemSelector).length > 0
+                        && $(e.target).parents().find(this.tabItemSelector).length > 0){
+                        this.onTabEditFinish();
+                    }
                 }
             }.bind(this));
             this.renderScaleRange();
