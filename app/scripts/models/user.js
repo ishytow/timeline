@@ -1,5 +1,3 @@
-/*global define*/
-
 define([
     'underscore',
     'backbone'
@@ -13,13 +11,10 @@ define([
         },
 
         defaults: {
-        },
-
-        validate: function(attrs, options) {
-        },
-
-        parse: function(response, options)  {
-            return response;
+            uuid: '',
+            firstName: 'FName',
+            lastName: 'LName',
+            imgUrl: 'http://tpstatic.com/img/profile/default_user.jpg'
         }
     });
 

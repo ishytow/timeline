@@ -1,6 +1,9 @@
 div.vispanel.center {
   z-index: 1000;
 }
+#user-container {
+  padding-right: 0;
+}
 .timeline-container {
   overflow: hidden;
   min-height: 360px;
@@ -16,6 +19,10 @@ div.vispanel.center {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+.add-calendar-btn {
+  margin-top: 8px;
+  margin-left: 5px;
 }
 .add-calendar-btn {
   margin-top: 8px;
