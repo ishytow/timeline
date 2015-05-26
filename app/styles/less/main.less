@@ -7,20 +7,57 @@
 @selected-item-font-color: #15429A;
 @selected-item-border-color: #FFB836;
 @selected-item-background-color: #FFD27C;
+@dropable-group-background-color: #7394D6;
+@user-background-color: #3FB8AF;
+@user-border-color: #22A198;
+@user-container-border-color: #068E84;
 
 div.vispanel.center{
     z-index: 1000;
 }
 #user-container{
     padding-right: 0;
+    border: 1px solid @user-container-border-color;
+    margin-top: 42px;
+    min-height: 360px;
+    padding-bottom: 5px;
+    border-radius: 0 0 10px 10px;
+    -moz-border-radius: 0 0 10px 10px;
+    -webkit-border-radius: 0 0 10px 10px;
+    .user {
+        height: 35px;
+        margin-top: 5px;
+        background-color: @user-background-color;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        border: 1px solid @user-border-color;
+        margin-left: -10px;
+        margin-right: 5px;
+    }
+}
+.draggable-user{
+    width: 178px;
+    opacity: 0.6;
+    background-color: #99E6E0;
+    border: 1px solid #65D0C8;
+    border-radius: 15px 15px 15px 15px;
+    -moz-border-radius: 15px 15px 15px 15px;
+    -webkit-border-radius: 15px 15px 15px 15px;
+}
+#calendars-container{
+    padding-right: 0;
 }
 .timeline-container{
     overflow: hidden;
     min-height: 360px;
-    border-radius: 0px 0px 10px 10px;
-    -moz-border-radius: 0px 0px 10px 10px;
-    -webkit-border-radius: 0px 0px 10px 10px;
+    border-radius: 0 0 10px 10px;
+    -moz-border-radius: 0 0 10px 10px;
+    -webkit-border-radius: 0 0 10px 10px;
     border: 1px solid @border-color;
+}
+.hovered-group{
+    background-color: @dropable-group-background-color;
+    opacity: 0.3;
 }
 .noUi-connect {
     background: @slider-color;

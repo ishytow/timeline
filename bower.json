@@ -10,7 +10,7 @@
     "modernizr": "~2.7.1",
     "handlebars": "~1.3.0",
     "bootstrap": "~3.3.4",
-    "vis": "~3.12.0",
+    "vis": "latest",
     "moment": "~2.10.2",
     "jquery-mousewheel": "~3.1.12",
     "eonasdan-bootstrap-datetimepicker": "~4.7.14",

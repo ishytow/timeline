@@ -4,7 +4,8 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'templates'
+    'templates',
+    'jquery-ui'
 ], function ($, _, Backbone, JST) {
     'use strict';
 
@@ -20,7 +21,19 @@ define([
         },
 
         render: function () {
-            this.$el.html(this.template(this.model.toJSON()));
+            this.$el.html(this.template(this.model.toJSON())).attr('data-uuid', this.model.get('uuid'));
+            this.$el.draggable({
+                cursor: 'move',
+                cursorAt:{
+                    top: 5,
+                    left: 5
+                },
+                helper: 'clone',
+                start: function(e, ui){
+                    $(ui.helper).addClass("draggable-user");
+                },
+                revert: false
+            });
             return this;
         }
     });

@@ -101,7 +101,11 @@ define([
             }
         },
 
-        renderEditModal: function(){
+        renderCreateModal: function(){
+            this.renderEditModal(true);
+        },
+
+        renderEditModal: function(isNew){
             $('#modals-container').html(this.editModalTemplate(this.model.toJSON()));
             this.editModal = $('#modals-container #edit-modal-' + this.model.get('uuid'));
             this.editModal.modal('show');
@@ -128,11 +132,18 @@ define([
                     startDate: moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm', 'en').toDate().getTime(),
                     endDate: moment(this.editModal.find('.end-dp').val(), 'MMM DD, HH:mm', 'en').toDate().getTime()
                 };
-                console.log(moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm', 'en'));
                 this.model.set(updatedValues);
                 this.editModal.modal('hide');
                 //TODO:
                 //this.model.save();
+            }.bind(this));
+
+            this.editModal.find('.cancel').on('click', function(){
+                if(isNew && isNew === true){
+                    this.model.trigger('cancel-create', this.model);
+                    //TODO:
+                    // this.model.destroy();
+                }
             }.bind(this));
         },
 

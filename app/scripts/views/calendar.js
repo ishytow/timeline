@@ -13,7 +13,8 @@ define([
     'utils',
     'moment',
     'EventListener',
-    'slider'
+    'slider',
+    'jquery-ui'
 ], function ($, _, Backbone, JST, EventModel, EventView, TimelineView, EventsCollection, EventsView, Utils, moment, EventListener) {
     'use strict';
 
@@ -39,7 +40,7 @@ define([
             this.eventsCollection = new EventsCollection();
             this.eventsView = new EventsView({collection: this.eventsCollection});
             this.listenTo(this.eventsCollection, "change", this.onEventChange);
-            this.listenTo(this.eventsCollection, "destroy", this.onEventRemove);
+            this.listenTo(this.eventsCollection, "cancel-create", this.onEventCancelCreate);
         },
 
         getTimelineView: function(){
@@ -66,6 +67,10 @@ define([
             this.getTimelineView().updateTimeline();
         },
 
+        onEventCancelCreate: function(model){
+            this.eventsCollection.remove(model);
+        },
+
         onEventRemove: function(model){
             this.eventsCollection.remove(model);
             this.getTimelineView().updateTimeline();
@@ -81,6 +86,7 @@ define([
             }
             this.fetchEvents();
             this.getTimelineView().updateTimeline(options);
+            this.initDroppable();
         },
 
         onMouseWheel: function(e){
@@ -94,13 +100,17 @@ define([
             this.updateTimeline({scrollDirection: scrollDirection});
         },
 
-        onAddEvent: function(properties){
+        onAddEvent: function(properties, userId){
             if(properties.group !== null){
-                var defaultDates = Utils.getNewEventDefaultDates(this.timelineView.groups.get(properties.group).day, properties.snappedTime);
-                var eventModel = new EventModel(defaultDates);
+                var options = {};
+                options = Utils.getNewEventDefaultDates(this.timelineView.groups.get(properties.group).day, properties.snappedTime);
+                if(userId){
+                    options.assignTo = userId;
+                }
+                var eventModel = new EventModel(options);
                 var eventView = new EventView({model: eventModel});
                 this.eventsCollection.add(eventModel);
-                eventView.renderEditModal(true);
+                eventView.renderCreateModal();
             }
         },
 
@@ -240,6 +250,19 @@ define([
             this.isTitleEdit = false;
         },
 
+        onDrop: function(e, el){
+            var eventProperties = this.timelineView.timeline.getEventProperties(e);
+            this.onAddEvent(eventProperties, $(el.draggable).data('uuid'));
+        },
+
+        initDroppable: function(){
+            this.timelineView.$el.find('.foreground .group').droppable({
+                hoverClass: 'hovered-group',
+                tolerance: 'pointer',
+                drop: this.onDrop.bind(this)
+            });
+        },
+
         render: function () {
             this.$el.html(this.template(this.model.toJSON())).attr('id', 'calendar-' + this.model.get('uuid'));
             this.tabItemSelector = '.calendars-tabs li[data-uuid="' + this.model.get('uuid') + '"]';
@@ -248,6 +271,7 @@ define([
             this.$el.find('.timeline-container').on('mousewheel', this.onMouseWheel.bind(this));
             this.timelineView.timeline.on('doubleClick', this.onDoubleClick.bind(this));
             this.timelineView.timeline.on('contextmenu', this.onTimelineContextMenu.bind(this));
+            this.initDroppable();
             $(document).on('click', function(e){
                 if($(e.target).parents(this.tabItemSelector).length === 0
                     && !$(e.target).is(this.tabItemSelector)
