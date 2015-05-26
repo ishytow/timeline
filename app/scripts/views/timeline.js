@@ -32,13 +32,13 @@ define([
 
         initPopovers: function(){
             EventListener.get('timeline').trigger('timeline-created', {timeLineEl: this.$el});
-            var popoversSelectors = this.$el.find('.popover-trigger').parents('.item[class*="event-item-"]');
+            var popoversSelectors = this.$el.find('.popover-trigger').parents('.vis-item[class*="event-item-"]');
             popoversSelectors.click(function(){
                 popoversSelectors.not(this).popover('hide');
             });
             $(document).on('click', function (e) {
-                if ((!$(e.target).is('.item[class*="event-item-"]')
-                    && $(e.target).parents('.item[class*="event-item-"]').length === 0
+                if ((!$(e.target).is('.vis-item[class*="event-item-"]')
+                    && $(e.target).parents('.vis-item[class*="event-item-"]').length === 0
                     && $(e.target).parents('.popover.in').length === 0)
                     || $(e.target).is('.display-mode .edit, .display-mode .remove')) {
                     popoversSelectors.popover('hide');
@@ -48,11 +48,8 @@ define([
 
         initTimeline: function(){
             this.options = Utils.getTimelineOptions(this.calendar);
-            if(this.timeline !== null){
-                this.timeline.clear();
-            }else{
+            if(this.timeline === null){
                 this.timeline = new vis.Timeline(this.el);
-                this.timeline.setOptions(this.options);
             }
             this.timeline.setOptions(this.options);
             this.timeline.setGroups(this.groups);

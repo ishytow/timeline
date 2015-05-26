@@ -12,9 +12,6 @@
 @user-border-color: #22A198;
 @user-container-border-color: #068E84;
 
-div.vispanel.center{
-    z-index: 1000;
-}
 #user-container{
     padding-right: 0;
     border: 1px solid @user-container-border-color;
@@ -81,43 +78,43 @@ div.vispanel.center{
 .tab-item{
     width: 170px;
 }
-.vis.timeline {
 
-    .timeaxis {
-        .text {
+.vis-timeline {
+
+    border: none;
+
+    .vis-time-axis {
+        .vis-text {
             color: @timeline-text;
         }
     }
-    &.root {
-//        border: 1px solid @border-color;
-        border: none;
-    }
-    .group{
+    .vis-group{
         min-height: 47px;
     }
-    .timeaxis .grid.minor {
+    .vis-time-axis .vis-grid.vis-minor {
         border-color: @border-color;
     }
-    .vispanel{
-        &.bottom, &.center, &.left, &.right, &.top{
+    .vis-panel{
+        &.vis-bottom, &.vis-center, &.vis-left, &.vis-right, &.vis-top{
             border-color: @border-color;
         }
-        &.center{
+        &.vis-center{
             z-index: 1000;
         }
     }
-    .labelset{
-        .vlabel {
+    .vis-labelset{
+        .vis-label {
             color: @timeline-text;
             border-bottom: 1px solid @border-color;
+            min-height: 47px;
         }
     }
-    .foreground{
-        .group {
+    .vis-foreground{
+        .vis-group {
             border-bottom: 1px solid @border-color;
         }
     }
-    .item {
+    .vis-item {
         font-size: 14px;
         color: @item-font-color;
         border-color: @item-border-color;

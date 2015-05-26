@@ -146,7 +146,25 @@ module.exports = function (grunt) {
                 'test/spec/{,*/}*.js'
             ]
         },
+
         copy: {
+            vis: {
+                files: [{
+                    cwd: '<%= yeoman.app %>/bower_components/vis',
+                    src: '**/*',
+                    dest: '.tmp/vis',
+                    expand: true
+                },{
+                    src: '<%= yeoman.app %>/visBuildConfig.js',
+                    dest: '.tmp/vis/visBuildConfig.js'
+                }]
+            },
+            visBuild: {
+                files: [{
+                    src: '.tmp/vis/vis-custom.js',
+                    dest: '<%= yeoman.app %>/scripts/vis.js'
+                }]
+            },
             dist: {
                 files: [{
                     expand: true,
@@ -231,7 +249,31 @@ module.exports = function (grunt) {
                     '.tmp/scripts/templates.js': ['<%= yeoman.app %>/scripts/templates/*.hbs']
                 }
             }
+        },
+
+        exec: {
+            installNpm: {
+                cwd: '.tmp/vis',
+                cmd: 'npm install'
+            },
+            installBrowserify: {
+                cwd: '.tmp/vis',
+                cmd: 'npm install -g browserify'
+            },
+            runBrowserify: {
+                cwd: '.tmp/vis',
+                cmd: 'browserify visBuildConfig.js -t babelify -o vis-custom.js -s vis'
+            }
         }
+    });
+
+    grunt.registerTask('buildVis', 'Build custom vis.js', function() {
+        grunt.task.run(['copy:vis',
+            'exec:installNpm',
+            'exec:installBrowserify',
+            'exec:runBrowserify',
+            'copy:visBuild'
+        ]);
     });
 
     grunt.registerTask('createDefaultTemplate', function () {
@@ -312,8 +354,9 @@ module.exports = function (grunt) {
         'handlebars',
         'less',
         'concat_css',
+        'buildVis',
         'requirejs:dist',
-        'copy'
+        'copy:dist'
     ]);
 
     grunt.registerTask('buildDebug', [
@@ -323,7 +366,7 @@ module.exports = function (grunt) {
         'less',
         'concat_css',
         'requirejs:distDebug',
-        'copy'
+        'copy:dist'
     ]);
 
     grunt.registerTask('default', [

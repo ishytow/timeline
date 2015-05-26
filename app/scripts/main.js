@@ -18,7 +18,6 @@ require.config({
         underscore: '../bower_components/lodash/dist/lodash',
         handlebars: '../bower_components/handlebars/handlebars',
         templates: '../../.tmp/scripts/templates',
-        vis: '../bower_components/vis/dist/vis.min',
         moment: '../bower_components/moment/min/moment-with-locales.min',
         bootstrap: '../bower_components/bootstrap/dist/js/bootstrap.min',
         slider: '../bower_components/nouislider/distribute/jquery.nouislider.all.min',

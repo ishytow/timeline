@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "dependencies": {
     "grunt-closure-tools": "^0.9.8",
-    "grunt-concat-css": "^0.3.1"
+    "grunt-concat-css": "^0.3.1",
+    "grunt-exec": "~0.4.6"
   },
   "devDependencies": {
     "apache-server-configs": "^2.8.0",

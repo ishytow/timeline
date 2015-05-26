@@ -256,7 +256,7 @@ define([
         },
 
         initDroppable: function(){
-            this.timelineView.$el.find('.foreground .group').droppable({
+            this.timelineView.$el.find('.vis-foreground .vis-group').droppable({
                 hoverClass: 'hovered-group',
                 tolerance: 'pointer',
                 drop: this.onDrop.bind(this)

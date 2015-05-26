@@ -124,12 +124,7 @@ define(['moment', 'templates'],function(moment, JST){
                             minute: 'HH:mm',
                             hour: 'HH:mm'
                         }
-                    },
-                    onAdd: this.onAdd,
-                    onUpdate: this.onUpdate,
-                    onMove: this.onMove,
-                    onMoving: this.onMoving,
-                    onRemove: this.onRemove
+                    }
                 };
             },
 

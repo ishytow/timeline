@@ -1,6 +1,3 @@
-div.vispanel.center {
-  z-index: 1000;
-}
 #user-container {
   padding-right: 0;
   border: 1px solid #068e84;
@@ -67,42 +64,43 @@ div.vispanel.center {
 .tab-item {
   width: 170px;
 }
-.vis.timeline .timeaxis .text {
-  color: #ffffff;
-}
-.vis.timeline.root {
+.vis-timeline {
   border: none;
 }
-.vis.timeline .group {
+.vis-timeline .vis-time-axis .vis-text {
+  color: #ffffff;
+}
+.vis-timeline .vis-group {
   min-height: 47px;
 }
-.vis.timeline .timeaxis .grid.minor {
+.vis-timeline .vis-time-axis .vis-grid.vis-minor {
   border-color: #df691a;
 }
-.vis.timeline .vispanel.bottom,
-.vis.timeline .vispanel.center,
-.vis.timeline .vispanel.left,
-.vis.timeline .vispanel.right,
-.vis.timeline .vispanel.top {
+.vis-timeline .vis-panel.vis-bottom,
+.vis-timeline .vis-panel.vis-center,
+.vis-timeline .vis-panel.vis-left,
+.vis-timeline .vis-panel.vis-right,
+.vis-timeline .vis-panel.vis-top {
   border-color: #df691a;
 }
-.vis.timeline .vispanel.center {
+.vis-timeline .vis-panel.vis-center {
   z-index: 1000;
 }
-.vis.timeline .labelset .vlabel {
+.vis-timeline .vis-labelset .vis-label {
   color: #ffffff;
   border-bottom: 1px solid #df691a;
+  min-height: 47px;
 }
-.vis.timeline .foreground .group {
+.vis-timeline .vis-foreground .vis-group {
   border-bottom: 1px solid #df691a;
 }
-.vis.timeline .item {
+.vis-timeline .vis-item {
   font-size: 14px;
   color: #ffffff;
   border-color: #97b0f8;
   background-color: #7394d6;
 }
-.vis.timeline .item.selected {
+.vis-timeline .vis-item.selected {
   color: #15429a;
   border-color: #ffb836;
   background-color: #ffb836;
