@@ -8,3 +8,5 @@ test/bower_components/
 .idea
 
 app/scripts/vis.js
+
+npm-debug.log

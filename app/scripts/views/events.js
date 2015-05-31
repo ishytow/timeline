@@ -18,7 +18,16 @@ define([
                 var eventItems = eventView.renderItem(calendar).items;
                 $.merge(this.items, eventItems);
             }.bind(this), this);
+            return this;
+        },
 
+        updateItems: function(calendar){
+            this.items = [];
+            this.collection.each(function(event){
+                var eventView = new Event({model: event});
+                var eventItems = eventView.renderItem(calendar).items;
+                $.merge(this.items, eventItems);
+            }.bind(this), this);
             return this;
         }
     });

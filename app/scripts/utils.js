@@ -7,6 +7,7 @@ define(['moment', 'templates'],function(moment, JST){
             config: {
                 week: 0,
                 daysCount: 7,
+                use24: true,
                 defaultEventTimeStep: 0.25,
                 dates: {
                     startTime: {
@@ -18,6 +19,21 @@ define(['moment', 'templates'],function(moment, JST){
                         minutes: 0
                     }
                 }
+            },
+
+            isUse24: function(){
+                return this.config.use24;
+            },
+
+            setUse24: function(use24){
+                this.config.use24 = use24;
+            },
+
+            getHoursFormat: function(){
+                if(this.config.use24 === true){
+                    return 'HH:mm'
+                }
+                return 'hh:mm A'
             },
 
             getUuid: function(){
@@ -51,7 +67,12 @@ define(['moment', 'templates'],function(moment, JST){
                         content: days[i].format('ddd, DD.MM'),
                         className: 'tileline-group-' + i,
                         style: 'min-height: 47px; width: 85px;',
-                        day: days[i]
+                        day: days[i],
+                        subgroupOrder: function(a, b){
+                            a = moment(a.startDate, 'MMM DD, ' + this.getHoursFormat(), 'en').toDate().getTime();
+                            b = moment(b.startDate, 'MMM DD, ' + this.getHoursFormat(), 'en').toDate().getTime();
+                            return a > b ? 1 : a < b ? -1 : 0;
+                        }.bind(this)
                     });
                 }
                 return groups;
@@ -99,8 +120,8 @@ define(['moment', 'templates'],function(moment, JST){
                 var mSnappedTime = moment(snappedTime);
                 var date = groupDay.clone();
                 return {
-                    startDate: date.hour(mSnappedTime.hour()).minute(mSnappedTime.minute()).second(0),
-                    endDate: date.clone().add(this.config.defaultEventTimeStep, 'hours')
+                    startDate: date.hour(mSnappedTime.hour()).minute(mSnappedTime.minute()).second(0).locale('en').toDate().getTime(),
+                    endDate: date.clone().add(this.config.defaultEventTimeStep, 'hours').locale('en').toDate().getTime()
                 }
             },
 
@@ -121,8 +142,8 @@ define(['moment', 'templates'],function(moment, JST){
                     stack: false,
                     format: {
                         minorLabels: {
-                            minute: 'HH:mm',
-                            hour: 'HH:mm'
+                            minute: this.getHoursFormat(),
+                            hour: this.getHoursFormat()
                         }
                     }
                 };
@@ -153,8 +174,8 @@ define(['moment', 'templates'],function(moment, JST){
                         uuid: uuid,
                         assignTo: 'assignTo-' + id,
                         calendarId: 'calendar-id-' + calendar.get('uuid'),
-                        startDate: startItemTime,
-                        endDate: endItemTime,
+                        startDate: startItemTime.getTime(),
+                        endDate: endItemTime.getTime(),
                         title: 'Event title #' + uuid.substr(0, 4),
                         description: 'Awesome description of awesome event with uuid ' + uuid
                     });
@@ -182,6 +203,19 @@ define(['moment', 'templates'],function(moment, JST){
                 }
 
                 return calendars
+            },
+
+            getMockedUsers: function(){
+                var users = [];
+                for (var i = 0; i < 10; i++){
+                    users.push({
+                        uuid: i,
+                        firstName: 'FName' + i,
+                        lastName: 'LName' + i
+                    })
+                }
+
+                return users;
             }
         }
     };

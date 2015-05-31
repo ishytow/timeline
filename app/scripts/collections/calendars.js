@@ -8,7 +8,7 @@ define([
     'use strict';
 
     var CalendarsCollection = Backbone.Collection.extend({
-        url: 'http://193.106.27.210:8080/services/stub/calendars?id=1',
+        url: 'https://193.106.27.210/services/stub/calendars?id=3',
 
         comparator: function(a, b) {
             a = a.get('position');

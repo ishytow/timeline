@@ -15,8 +15,8 @@ define([
     var CalendarsView = Backbone.View.extend({
         template: JST['app/scripts/templates/calendars.hbs'],
         tabItemTemplate: JST['app/scripts/templates/calendar-tab-item.hbs'],
-        calendarMenuTemplate: JST['app/scripts/templates/calendar-menu.hbs'],
-        calendarMenuDefaultTemplate: JST['app/scripts/templates/calendar-menu-default.hbs'],
+        calendarMenuTemplate: JST['app/scripts/templates/menu-calendar.hbs'],
+        calendarMenuDefaultTemplate: JST['app/scripts/templates/menu-calendar-default.hbs'],
         tagName: 'div',
 
         onTabSoreted: function(e, ui){

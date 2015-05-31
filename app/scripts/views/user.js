@@ -11,6 +11,7 @@ define([
 
     var UserView = Backbone.View.extend({
         template: JST['app/scripts/templates/user.hbs'],
+        templateSelectItem: JST['app/scripts/templates/user-select-item.hbs'],
 
         tagName: 'div',
 
@@ -34,6 +35,11 @@ define([
                 },
                 revert: false
             });
+            return this;
+        },
+
+        renderSelectItem: function () {
+            this.$selectItemEl = $(this.templateSelectItem(this.model.toJSON()));
             return this;
         }
     });

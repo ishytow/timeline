@@ -10,7 +10,9 @@ define([
     'collections/calendars',
     'collections/users',
     'views/calendars',
-    'views/users'
+    'views/users',
+    'select2',
+    'helpers/use24'
 ], function ($, _, Backbone, JST, Utils, EventListener, CalendarsCollection, UsersCollection, CalendarsView, UsersView) {
     'use strict';
 
@@ -21,19 +23,8 @@ define([
         calendarsView: null,
 
         initialize: function(){
-            var mockedUsers = function(){
-                var users = [];
-                for (var i = 0; i < 10; i++){
-                    users.push({
-                        uuid: i,
-                        firstName: 'FName' + i,
-                        lastName: 'LName' + i
-                    })
-                }
-                return users;
-            };
             this.calendarsCollection = new CalendarsCollection();
-            this.usersCollection = new UsersCollection(mockedUsers());
+            this.usersCollection = new UsersCollection(Utils.getMockedUsers());
         },
 
         render: function () {
@@ -45,7 +36,33 @@ define([
                 }.bind(this)
             });
             this.usersView = new UsersView({collection: this.usersCollection});
-            this.$el.find('#user-container').html(this.usersView.render().el);
+            this.$el.find('#users .select').html(this.usersView.renderSelect().$selectEl);
+            this.$el.find('.users-select').select2({
+                placeholder: "Select users",
+                allowClear: true,
+                multiple: true,
+                dropdownCssClass: 'select2-users'
+            });
+
+            var _this = this;
+            this.$el.find('.users-select').val('').trigger('change');
+            this.$el.find('.users-select').on('change', function(e){
+                var selectedIds = $(this).val();
+                $.each(_this.$el.find('#users .user'), function(){
+                    if(selectedIds === null){
+                        $(this).fadeIn();
+                    }else if($.inArray($(this).data('uuid').toString(), selectedIds) === -1){
+                        $(this).fadeOut();
+                    }else{
+                        $(this).fadeIn();
+                    }
+                });
+            });
+            this.$el.find('#users .list').html(this.usersView.render().el);
+            $(document).on('change', '.use24 input', function(){
+                Utils.setUse24($(this).prop("checked"));
+                EventListener.get('timeline').trigger('use24');
+            });
             return this;
         }
     });

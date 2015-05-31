@@ -1,22 +1,85 @@
-#user-container {
+#users {
   padding-right: 0;
-  border: 1px solid #068e84;
-  margin-top: 42px;
-  min-height: 360px;
-  padding-bottom: 5px;
+  padding-left: 0;
   border-radius: 0 0 10px 10px;
   -moz-border-radius: 0 0 10px 10px;
   -webkit-border-radius: 0 0 10px 10px;
+  border: 1px solid #068e84;
 }
-#user-container .user {
+#users .select {
+  margin: 5px 5px;
+}
+#users .select .select2-container {
+  width: 100% !important;
+}
+#users .select .select2-selection__choice {
+  border: 0;
+  background-color: #65D0C8;
+  overflow: hidden;
+  width: 68px;
+  text-overflow: ellipsis;
+  font-size: 13px;
+}
+#users .select .select2-selection {
+  background-color: #4e5d6c;
+  border: 0;
+  min-height: 40px;
+}
+#users .select input {
+  color: #FFFFFF;
+  width: 100% !important;
+}
+#users .list {
+  padding-right: 0;
+  min-height: 360px;
+  padding-bottom: 5px;
+}
+#users .list .user {
   height: 35px;
   margin-top: 5px;
   background-color: #3fb8af;
   padding-top: 3px;
   padding-bottom: 3px;
   border: 1px solid #22a198;
-  margin-left: -10px;
+  margin-left: 5px;
   margin-right: 5px;
+}
+.select2-users,
+.select2-event-users {
+  background-color: #4e5d6c !important;
+  border: 0 !important;
+}
+.select2-users .select2-results__option[aria-selected=true],
+.select2-event-users .select2-results__option[aria-selected=true] {
+  background-color: #99E6E0 !important;
+  color: #000 !important;
+}
+.select2-users ::-webkit-scrollbar,
+.select2-event-users ::-webkit-scrollbar {
+  width: 5px;
+}
+.select2-users ::-webkit-scrollbar-thumb,
+.select2-event-users ::-webkit-scrollbar-thumb {
+  background-color: #22A198;
+}
+.edit-modal .user .select2-container {
+  width: 100% !important;
+}
+.edit-modal .user .select2-selection__choice {
+  border: 0;
+  background-color: #65D0C8;
+  overflow: hidden;
+  width: 68px;
+  text-overflow: ellipsis;
+  font-size: 13px;
+}
+.edit-modal .user .select2-selection {
+  border: 0;
+  min-height: 40px;
+}
+.edit-modal .user input {
+  color: #FFFFFF;
+  width: 100% !important;
 }
 .draggable-user {
   width: 178px;
@@ -100,7 +163,7 @@
   border-color: #97b0f8;
   background-color: #7394d6;
 }
-.vis-timeline .vis-item.selected {
+.vis-timeline .vis-item.vis-selected {
   color: #15429a;
   border-color: #ffb836;
   background-color: #ffb836;
@@ -141,4 +204,13 @@
 .noUi-handle:after,
 .noUi-handle:before {
   display: none;
+}
+#context-menu .use24 {
+  padding: 3px 20px;
+}
+#context-menu .use24 label {
+  width: 100%;
+}
+#context-menu .use24 label input {
+  float: right;
 }

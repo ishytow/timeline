@@ -17,7 +17,8 @@
     "uuid-js": "~0.7.5",
     "nouislider": "~7.0.10",
     "bootswatch": "latest",
-    "jquery-ui": "~1.11.4"
+    "jquery-ui": "~1.11.4",
+    "select2": "~4.0.0"
   },
   "devDependencies": {}
 }

@@ -88,6 +88,9 @@ define([
                 }
                 this.$el.stop().animate({'marginTop' : animationParams.marginTop, 'opacity': 0},200,function(){
                     this.initTimeline();
+                    if (options && options.callback){
+                        options.callback.call();
+                    }
                     this.$el.css('marginTop', animationParams.marginTopReverse)
                         .animate({'marginTop' : '0px', 'opacity': 1},200,function(){
                             this.$el.parent('.timeline-container').animate({'height' : this.$el.height() + 'px'},200,function(){
@@ -98,6 +101,9 @@ define([
             }else{
                 this.$el.fadeOut(500, function(){
                     this.initTimeline();
+                    if (options && options.callback){
+                        options.callback.call();
+                    }
                     this.$el.parent('.timeline-container').animate({'height' : this.$el.height() + 'px'},200,function(){
                         this.$el.parent('.timeline-container').height(this.$el.height());
                     }.bind(this));

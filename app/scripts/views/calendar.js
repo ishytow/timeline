@@ -21,9 +21,9 @@ define([
     var CalendarView = Backbone.View.extend({
         template: JST['app/scripts/templates/calendar.hbs'],
         contextMenuTemplates: {
-            onTimeline: JST['app/scripts/templates/timelineMenu.hbs'],
-            onItem: JST['app/scripts/templates/itemMenu.hbs'],
-            default: JST['app/scripts/templates/defaultMenu.hbs']
+            onTimeline: JST['app/scripts/templates/menu-timeline.hbs'],
+            onItem: JST['app/scripts/templates/menu-item.hbs'],
+            default: JST['app/scripts/templates/menu-default.hbs']
         },
         timelineView: null,
         eventsCollection: null,
@@ -40,11 +40,17 @@ define([
             this.eventsCollection = new EventsCollection();
             this.eventsView = new EventsView({collection: this.eventsCollection});
             this.listenTo(this.eventsCollection, "change", this.onEventChange);
+            this.listenTo(this.eventsCollection, "destroy", this.onEventRemove);
             this.listenTo(this.eventsCollection, "cancel-create", this.onEventCancelCreate);
         },
 
-        getTimelineView: function(){
-            var items = this.eventsView.renderItems(this.model).items;
+        getTimelineView: function(updateItems){
+            var items;
+            if(updateItems && updateItems === true){
+                items = this.eventsView.renderItems(this.model).items;
+            }else{
+                items = this.eventsView.updateItems(this.model).items;
+            }
             if(this.timelineView === null){
                 this.timelineView = new TimelineView({items: items, calendar: this.model});
             }else{
@@ -64,7 +70,8 @@ define([
         },
 
         onEventChange: function(){
-            this.getTimelineView().updateTimeline();
+            //TODO: change to this.updateTimeline
+            this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
         },
 
         onEventCancelCreate: function(model){
@@ -73,7 +80,8 @@ define([
 
         onEventRemove: function(model){
             this.eventsCollection.remove(model);
-            this.getTimelineView().updateTimeline();
+            //TODO: change to this.updateTimeline
+            this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
         },
 
         updateTimeline: function(options){
@@ -84,9 +92,9 @@ define([
                     Utils.setWeek(Utils.getWeek() + 1);
                 }
             }
+            options.callback = this.initDroppable.bind(this);
             this.fetchEvents();
-            this.getTimelineView().updateTimeline(options);
-            this.initDroppable();
+            this.getTimelineView(true).updateTimeline(options);
         },
 
         onMouseWheel: function(e){
@@ -184,7 +192,7 @@ define([
             var updateLowerTooltip = function(value){
                 var selectedMinutes = value.substr(0, value.indexOf('.'));
                 var time = moment().locale('en').hour(0).minute(0).second(0).add(selectedMinutes, 'minutes');
-                var formattedTime = time.format('HH:mm');
+                var formattedTime = time.format(Utils.getHoursFormat());
                 $(this).html(
                     '<div class="tooltip-arrow"></div>' +
                     '<div class="tooltip-inner">' + formattedTime + '</div>'
@@ -193,7 +201,7 @@ define([
             var updateUpperTooltip = function(value){
                 var selectedMinutes = value.substr(0, value.indexOf('.'));
                 var time = moment().locale('en').hour(0).minute(0).second(0).add(selectedMinutes, 'minutes');
-                var formattedTime = (time.format('HH:mm') !== '00:00') ? time.format('HH:mm') : '24:00';
+                var formattedTime = (time.format(Utils.getHoursFormat()) !== '00:00') ? time.format(Utils.getHoursFormat()) : '24:00';
                 $(this).html(
                     '<div class="tooltip-arrow"></div>' +
                     '<div class="tooltip-inner">' + formattedTime + '</div>'
@@ -223,7 +231,7 @@ define([
 
                 this.model.set('startTime', {hours: startTime.hour(), minutes: startTime.minute()});
                 this.model.set('endTime', {hours: (endTime.hour() !== 0) ? endTime.hour() : 24, minutes: endTime.minute()});
-                this.timelineView.updateTimeline();
+                this.timelineView.updateTimeline({});
                 this.$el.find('.timeline-scale-range-container').slideUp();
             }.bind(this));
             this.$el.find(".timeline-scale-range .remove").on('click', function(){
@@ -278,7 +286,9 @@ define([
                     && this.isTitleEdit === true){
                        this.onTabEditFinish();
                 }
-                this.contextMenu.hide();
+                if($(e.target).parents('.use24').length === 0){
+                    this.contextMenu.hide();
+                }
             }.bind(this));
             $(document).keypress(function(e) {
                 if(e.which == 13) {
@@ -289,6 +299,11 @@ define([
                 }
             }.bind(this));
             this.renderScaleRange();
+            EventListener.get('timeline').on('use24', function(){
+                this.updateTimeline({});
+                this.$el.find(".timeline-scale-range .slider")[0].destroy();
+                this.renderScaleRange();
+            }.bind(this));
             EventListener.get('timeline').on('edit-calendar-' + this.model.get('uuid'), this.onTabEdit.bind(this));
             EventListener.get('timeline').on('change-scale-' + this.model.get('uuid'), this.onChangeScale.bind(this));
             return this;

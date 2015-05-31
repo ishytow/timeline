@@ -8,8 +8,10 @@ define([
     'moment',
     'utils',
     'EventListener',
+    'collections/users',
+    'views/users',
     'bootstrap-datepicker'
-], function ($, _, Backbone, JST, moment, Utils, EventListener) {
+], function ($, _, Backbone, JST, moment, Utils, EventListener, UsersCollection, UsersView) {
     'use strict';
 
     var EventView = Backbone.View.extend({
@@ -59,8 +61,8 @@ define([
                         assignTo: this.model.get('assignTo'),
                         eventTitle: this.model.get('title'),
                         description: this.model.get('description'),
-                        startDate: eventStartDate.locale('en').format('MM.DD, HH:mm'),
-                        endDate: eventEndDate.locale('en').format('MM.DD, HH:mm'),
+                        startDate: eventStartDate.locale('en').format('MMM DD, '+ Utils.getHoursFormat()),
+                        endDate: eventEndDate.locale('en').format('MMM DD, '+ Utils.getHoursFormat()),
                         start: start,
                         end: end,
                         group: i,
@@ -112,12 +114,12 @@ define([
             this.editModal.find('.start-dp').datetimepicker({
                 defaultDate: this.model.get('startDate'),
                 locale: 'en',
-                format: 'MMM DD, HH:mm'
+                format: 'MMM DD, '+ Utils.getHoursFormat()
             });
             this.editModal.find('.end-dp').datetimepicker({
                 defaultDate: this.model.get('endDate'),
                 locale: 'en',
-                format: 'MMM DD, HH:mm',
+                format: 'MMM DD, '+ Utils.getHoursFormat(),
                 minDate: this.model.get('startDate')
             });
 
@@ -125,12 +127,23 @@ define([
                 this.editModal.find('.end-dp').data("DateTimePicker").minDate(e.date);
             }.bind(this));
 
+            var usersCollection = new UsersCollection(Utils.getMockedUsers());
+            var usersView = new UsersView({collection: usersCollection});
+            this.editModal.find('.user').html(usersView.renderSelect().$selectEl);
+
+            this.editModal.find('.users-select').select2({
+                multiple: false,
+                dropdownCssClass: 'select2-event-users'
+            });
+
+            this.editModal.find('.users-select').val('').trigger('change');
+
             this.editModal.find('.save').on('click', function(){
                 var updatedValues = {
                     title: this.editModal.find('.title').val(),
                     description: this.editModal.find('.description').val(),
-                    startDate: moment(this.editModal.find('.start-dp').val(), 'MMM DD, HH:mm', 'en').toDate().getTime(),
-                    endDate: moment(this.editModal.find('.end-dp').val(), 'MMM DD, HH:mm', 'en').toDate().getTime()
+                    startDate: moment(this.editModal.find('.start-dp').val(), 'MMM DD, '+ Utils.getHoursFormat(), 'en').toDate().getTime(),
+                    endDate: moment(this.editModal.find('.end-dp').val(), 'MMM DD, '+ Utils.getHoursFormat(), 'en').toDate().getTime()
                 };
                 this.model.set(updatedValues);
                 this.editModal.modal('hide');
