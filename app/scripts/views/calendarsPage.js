@@ -24,17 +24,13 @@ define([
 
         initialize: function(){
             this.calendarsCollection = new CalendarsCollection();
-            this.usersCollection = new UsersCollection(Utils.getMockedUsers());
+            this.usersCollection = new UsersCollection();
         },
 
-        render: function () {
-            this.$el.html(this.template());
-            this.calendarsCollection.fetch({
-                success: function(){
-                    this.calendarsView = new CalendarsView({collection: this.calendarsCollection});
-                    this.$el.find('#calendars-container').html(this.calendarsView.render().$el);
-                }.bind(this)
-            });
+        renderUsers: function(calendarUuid){
+            var _this = this;
+
+            this.usersCollection.set(Utils.getMockedUsers(calendarUuid));
             this.usersView = new UsersView({collection: this.usersCollection});
             this.$el.find('#users .select').html(this.usersView.renderSelect().$selectEl);
             this.$el.find('.users-select').select2({
@@ -43,8 +39,6 @@ define([
                 multiple: true,
                 dropdownCssClass: 'select2-users'
             });
-
-            var _this = this;
             this.$el.find('.users-select').val('').trigger('change');
             this.$el.find('.users-select').on('change', function(e){
                 var selectedIds = $(this).val();
@@ -59,6 +53,21 @@ define([
                 });
             });
             this.$el.find('#users .list').html(this.usersView.render().el);
+        },
+
+        render: function () {
+            this.$el.html(this.template());
+            this.calendarsCollection.fetch({
+                success: function(){
+                    this.calendarsView = new CalendarsView({collection: this.calendarsCollection});
+                    this.$el.find('#calendars-container').html(this.calendarsView.render().$el);
+                }.bind(this)
+            });
+
+            EventListener.get('timeline').on('calendar-shown', function(e){
+                this.renderUsers(e.uuid);
+            }.bind(this));
+
             $(document).on('change', '.use24 input', function(){
                 Utils.setUse24($(this).prop("checked"));
                 EventListener.get('timeline').trigger('use24');

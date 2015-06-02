@@ -116,7 +116,7 @@ define([
                     options.assignTo = userId;
                 }
                 var eventModel = new EventModel(options);
-                var eventView = new EventView({model: eventModel});
+                var eventView = new EventView({model: eventModel, calendar: this.model});
                 this.eventsCollection.add(eventModel);
                 eventView.renderCreateModal();
             }

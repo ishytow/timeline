@@ -89,7 +89,6 @@ define([
         removeCalendar: function(target){
             var calendarModel = this.collection.get(target.data('uuid'));
             this.collection.remove(calendarModel);
-            console.log(target.parent('.tab-item').hasClass('active'));
             if(target.parent('.tab-item').hasClass('active') && target.parent('.tab-item').prev().length > 0){
                 target.parent('.tab-item').prev().find('a.calendar-tab-item').tab('show');
             }
@@ -109,6 +108,12 @@ define([
             this.$el.find('.calendars-tabs a').click(function (e) {
                 e.preventDefault();
                 $(this).tab('show')
+            });
+
+            EventListener.get('timeline').trigger('calendar-shown',{uuid: this.$el.find('.calendars-tabs li a').first().data('uuid')});
+
+            this.$el.find('.calendars-tabs a').on('shown.bs.tab', function (e) {
+                EventListener.get('timeline').trigger('calendar-shown',{uuid: $(e.target).data('uuid')});
             });
             this.$el.find('.calendars-tabs').sortable({
                 containment: this.$el.find('.calendars-tabs'),

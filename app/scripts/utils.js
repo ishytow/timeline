@@ -172,7 +172,7 @@ define(['moment', 'templates'],function(moment, JST){
 
                     events.push({
                         uuid: uuid,
-                        assignTo: 'assignTo-' + id,
+                        assignTo: calendar.get('uuid') + i,
                         calendarId: 'calendar-id-' + calendar.get('uuid'),
                         startDate: startItemTime.getTime(),
                         endDate: endItemTime.getTime(),
@@ -205,12 +205,12 @@ define(['moment', 'templates'],function(moment, JST){
                 return calendars
             },
 
-            getMockedUsers: function(){
+            getMockedUsers: function(calendarUuid){
                 var users = [];
                 for (var i = 0; i < 10; i++){
                     users.push({
-                        uuid: i,
-                        firstName: 'FName' + i,
+                        uuid: calendarUuid + i,
+                        firstName: 'FName' + i + ' ' + calendarUuid.substr(0,2),
                         lastName: 'LName' + i
                     })
                 }

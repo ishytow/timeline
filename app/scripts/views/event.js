@@ -21,19 +21,20 @@ define([
         removeModalTemplate: JST['app/scripts/templates/event-remove-modal.hbs'],
         modalEl: null,
 
-        initialize: function () {
+        initialize: function (options) {
+            this.calendar = options.calendar;
             EventListener.get('timeline').on('timeline-created', function(options){
                 this.initPopover(options.timeLineEl);
             }.bind(this));
         },
 
-        getItemsByEvent: function(calendar){
+        getItemsByEvent: function(){
             var items = [];
             var days = Utils.getDays();
             var eventStartDate = moment(this.model.get('startDate'));
             var eventEndDate = moment(this.model.get('endDate'));
-            var startScaleDate = moment(Utils.getStartScaleDate(calendar));
-            var endScaleDate = moment(Utils.getEndScaleDate(calendar));
+            var startScaleDate = moment(Utils.getStartScaleDate(this.calendar));
+            var endScaleDate = moment(Utils.getEndScaleDate(this.calendar));
             var lastDate = days[days.length - 1].clone();
 
             for (var i = 0; i < days.length; i++) {
@@ -127,7 +128,7 @@ define([
                 this.editModal.find('.end-dp').data("DateTimePicker").minDate(e.date);
             }.bind(this));
 
-            var usersCollection = new UsersCollection(Utils.getMockedUsers());
+            var usersCollection = new UsersCollection(Utils.getMockedUsers(this.calendar.get('uuid')));
             var usersView = new UsersView({collection: usersCollection});
             this.editModal.find('.user').html(usersView.renderSelect().$selectEl);
 
@@ -136,17 +137,25 @@ define([
                 dropdownCssClass: 'select2-event-users'
             });
 
-            this.editModal.find('.users-select').val('').trigger('change');
+            if(this.model.get('assignTo')){
+                this.editModal.find('.users-select').val(this.model.get('assignTo')).trigger('change');
+            }else{
+                this.editModal.find('.users-select').val('').trigger('change');
+            }
 
             this.editModal.find('.save').on('click', function(){
                 var updatedValues = {
                     title: this.editModal.find('.title').val(),
                     description: this.editModal.find('.description').val(),
                     startDate: moment(this.editModal.find('.start-dp').val(), 'MMM DD, '+ Utils.getHoursFormat(), 'en').toDate().getTime(),
-                    endDate: moment(this.editModal.find('.end-dp').val(), 'MMM DD, '+ Utils.getHoursFormat(), 'en').toDate().getTime()
+                    endDate: moment(this.editModal.find('.end-dp').val(), 'MMM DD, '+ Utils.getHoursFormat(), 'en').toDate().getTime(),
+                    assignTo: this.editModal.find('.users-select').val()
                 };
+
                 this.model.set(updatedValues);
                 this.editModal.modal('hide');
+                console.log(this.model);
+                console.log( this.editModal.find('.users-select').val());
                 //TODO:
                 //this.model.save();
             }.bind(this));
@@ -192,7 +201,8 @@ define([
         },
 
         renderItem: function(calendar){
-            this.items = this.getItemsByEvent(calendar);
+            this.calendar = calendar;
+            this.items = this.getItemsByEvent();
             return this;
         }
     });
