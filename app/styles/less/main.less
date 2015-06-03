@@ -13,6 +13,14 @@
 @user-container-border-color: #068E84;
 
 //73g0u0kl2DTaOT0guL-pixquGsY
+
+.hoverEvent{
+    background-color: #FFD27C !important;
+}
+.hoverUser{
+    background-color: #65D0C8 !important;
+}
+
 #users{
     padding-right: 0;
     padding-left: 0;
@@ -48,19 +56,35 @@
             width: 100% !important;
         }
     }
-    .list{
+    .list-container{
         padding-right: 0;
-        min-height: 360px;
         padding-bottom: 5px;
-        .user {
-            height: 35px;
-            margin-top: 5px;
-            background-color: @user-background-color;
-            padding-top: 3px;
-            padding-bottom: 3px;
-            border: 1px solid @user-border-color;
-            margin-left: 5px;
-            margin-right: 5px;
+
+        .list{
+            min-height: 345px;
+
+            .user {
+                height: 35px;
+                margin-top: 5px;
+                background-color: @user-background-color;
+                padding-top: 3px;
+                padding-bottom: 3px;
+                border: 1px solid @user-border-color;
+                margin-left: 5px;
+                margin-right: 5px;
+                font-weight: 500;
+                cursor: pointer;
+
+                .image{
+                    width: 35px
+                }
+
+                .full-name{
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+            }
         }
     }
 }
@@ -196,6 +220,8 @@
         color: @item-font-color;
         border-color: @item-border-color;
         background-color: @item-background-color;
+        cursor: pointer;
+
         &.vis-selected {
             color: @selected-item-font-color;
             border-color: @selected-item-border-color;

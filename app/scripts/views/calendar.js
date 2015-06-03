@@ -286,9 +286,6 @@ define([
                     && this.isTitleEdit === true){
                        this.onTabEditFinish();
                 }
-                if($(e.target).parents('.use24').length === 0){
-                    this.contextMenu.hide();
-                }
             }.bind(this));
             $(document).keypress(function(e) {
                 if(e.which == 13) {

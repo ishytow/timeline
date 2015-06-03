@@ -8,7 +8,8 @@ define(['moment', 'templates'],function(moment, JST){
                 week: 0,
                 daysCount: 7,
                 use24: true,
-                defaultEventTimeStep: 0.25,
+                defaultEventMinHours: 0.25,
+                defaultEventMaxHours: 24,
                 dates: {
                     startTime: {
                         hours: 0,
@@ -121,7 +122,7 @@ define(['moment', 'templates'],function(moment, JST){
                 var date = groupDay.clone();
                 return {
                     startDate: date.hour(mSnappedTime.hour()).minute(mSnappedTime.minute()).second(0).locale('en').toDate().getTime(),
-                    endDate: date.clone().add(this.config.defaultEventTimeStep, 'hours').locale('en').toDate().getTime()
+                    endDate: date.clone().add(this.config.defaultEventMinHours, 'hours').locale('en').toDate().getTime()
                 }
             },
 
@@ -164,20 +165,36 @@ define(['moment', 'templates'],function(moment, JST){
                     startItemTime.setDate(startItemTime.getDate() + i);
                     startItemTime.setHours(id+4,0,0,0);
 
+                    var startItemTime2 = new Date();
+                    startItemTime2.setDate(startItemTime2.getDate() + i);
+                    startItemTime2.setHours(id+10,0,0,0);
+
                     var endItemTime = new Date();
                     endItemTime.setDate(endItemTime.getDate() + i);
                     endItemTime.setHours(id+8,0,0,0);
 
-                    var uuid = this.getUuid();
+                    var endItemTime2 = new Date();
+                    endItemTime2.setDate(endItemTime2.getDate() + i);
+                    endItemTime2.setHours(id+12,0,0,0);
 
                     events.push({
-                        uuid: uuid,
+                        uuid: this.getUuid(),
                         assignTo: calendar.get('uuid') + i,
                         calendarId: 'calendar-id-' + calendar.get('uuid'),
                         startDate: startItemTime.getTime(),
                         endDate: endItemTime.getTime(),
-                        title: 'Event title #' + uuid.substr(0, 4),
-                        description: 'Awesome description of awesome event with uuid ' + uuid
+                        title: 'Event title #' + this.getUuid().substr(0, 4),
+                        description: 'Awesome description of awesome event with uuid ' + this.getUuid()
+                    });
+
+                    events.push({
+                        uuid: this.getUuid(),
+                        assignTo: calendar.get('uuid') + i,
+                        calendarId: 'calendar-id-' + calendar.get('uuid'),
+                        startDate: startItemTime2.getTime(),
+                        endDate: endItemTime2.getTime(),
+                        title: 'Event title #' + this.getUuid().substr(0, 4),
+                        description: 'Awesome description of awesome event with uuid ' + this.getUuid()
                     });
                 }
 

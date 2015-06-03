@@ -1,4 +1,4 @@
-<div data-item-id="{{id}}" data-event-id="{{uuid}}" class="event-item-content text-center">
+<div data-item-id="{{id}}" data-event-id="{{uuid}}" data-event-user-id="{{assignTo}}" class="event-item-content text-center">
     <div class="popover-trigger"><b>{{eventTitle}}</b> : {{assignTo}}</div>
     <div class="popover-header hide">
         <b>{{eventTitle}}</b>
@@ -8,7 +8,7 @@
             <div class="display-mode">
                 <div><b>{{startDate}}</b> - <b>{{endDate}}</b></div>
                 <div>
-                    <h5>{{assignedTo}}</h5>
+                    <h5>AssignTo: {{assignTo}}</h5>
                 </div>
                 <div class="text-right">
                     <span class="glyphicon glyphicon-pencil edit"></span>

@@ -24,7 +24,7 @@ define([
                 title: "Default title",
                 description: "Default description",
                 startDate: moment().toDate().getTime(),
-                endDate: moment().add(Utils.config.defaultEventTimeStep, 'hours').toDate().getTime(),
+                endDate: moment().add(Utils.config.defaultEventMinHours, 'hours').toDate().getTime(),
                 assignTo: '',
                 createdBy: '',
                 calendarId: '',

@@ -108,6 +108,10 @@ define([
             this.renderEditModal(true);
         },
 
+        getMinDate: function(date){
+            return moment(date).clone().add(Utils.config.defaultEventMinHours,'hours');
+        },
+
         renderEditModal: function(isNew){
             $('#modals-container').html(this.editModalTemplate(this.model.toJSON()));
             this.editModal = $('#modals-container #edit-modal-' + this.model.get('uuid'));
@@ -121,11 +125,12 @@ define([
                 defaultDate: this.model.get('endDate'),
                 locale: 'en',
                 format: 'MMM DD, '+ Utils.getHoursFormat(),
-                minDate: this.model.get('startDate')
+                minDate: this.getMinDate(this.model.get('startDate'))
             });
 
             this.editModal.find('.start-dp').on("dp.change", function (e) {
-                this.editModal.find('.end-dp').data("DateTimePicker").minDate(e.date);
+                var minDate = this.getMinDate(e.date);
+                this.editModal.find('.end-dp').data("DateTimePicker").minDate(minDate).date(minDate);
             }.bind(this));
 
             var usersCollection = new UsersCollection(Utils.getMockedUsers(this.calendar.get('uuid')));
@@ -154,8 +159,6 @@ define([
 
                 this.model.set(updatedValues);
                 this.editModal.modal('hide');
-                console.log(this.model);
-                console.log( this.editModal.find('.users-select').val());
                 //TODO:
                 //this.model.save();
             }.bind(this));

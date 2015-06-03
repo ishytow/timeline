@@ -7,6 +7,8 @@ define([
     var UserModel = Backbone.Model.extend({
         url: '',
 
+        idAttribute: 'uuid',
+
         initialize: function() {
         },
 
