@@ -22,6 +22,10 @@ define(['moment', 'templates'],function(moment, JST){
                 }
             },
 
+            getUserId: function(){
+              return 2;
+            },
+
             isUse24: function(){
                 return this.config.use24;
             },
@@ -178,9 +182,9 @@ define(['moment', 'templates'],function(moment, JST){
                     endItemTime2.setHours(id+12,0,0,0);
 
                     events.push({
-                        uuid: this.getUuid(),
-                        assignTo: calendar.get('uuid') + i,
-                        calendarId: 'calendar-id-' + calendar.get('uuid'),
+                        id: this.getUuid(),
+                        assignTo: calendar.get('id') + i,
+                        calendarId: 'calendar-id-' + calendar.get('id'),
                         startDate: startItemTime.getTime(),
                         endDate: endItemTime.getTime(),
                         title: 'Event title #' + this.getUuid().substr(0, 4),
@@ -188,9 +192,9 @@ define(['moment', 'templates'],function(moment, JST){
                     });
 
                     events.push({
-                        uuid: this.getUuid(),
-                        assignTo: calendar.get('uuid') + i,
-                        calendarId: 'calendar-id-' + calendar.get('uuid'),
+                        id: this.getUuid(),
+                        assignTo: calendar.get('id') + i,
+                        calendarId: 'calendar-id-' + calendar.get('id'),
                         startDate: startItemTime2.getTime(),
                         endDate: endItemTime2.getTime(),
                         title: 'Event title #' + this.getUuid().substr(0, 4),
@@ -200,34 +204,13 @@ define(['moment', 'templates'],function(moment, JST){
 
                 return events
             },
-            getMockedCalendars: function(){
-                var calendars = [];
-                for (var i = 0; i <= 3; i++) {
-                    var uuid = this.getUuid();
-
-                    calendars.push({
-                        uuid: uuid,
-                        title: 'Cal ' + i,
-                        startTime: {
-                            hours: i,
-                            minutes: 0
-                        },
-                        endTime: {
-                            hours: 24 - i,
-                            minutes: 0
-                        }
-                    });
-                }
-
-                return calendars
-            },
 
             getMockedUsers: function(calendarUuid){
                 var users = [];
                 for (var i = 0; i < 10; i++){
                     users.push({
-                        uuid: calendarUuid + i,
-                        firstName: 'FName' + i + ' ' + calendarUuid.substr(0,2),
+                        id: calendarUuid + i,
+                        firstName: 'FName' + i + ' ' + calendarUuid,
                         lastName: 'LName' + i
                     })
                 }

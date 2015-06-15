@@ -7,11 +7,18 @@ define([
 
     var CalendarModel = Backbone.Model.extend({
 
-        idAttribute: 'uuid',
+        idAttribute: 'id',
+
+        url: function(){
+            if(typeof (this.get('id')) !== 'undefined' && this.get('id') !== null && this.get('id') !== ''){
+                return 'https://193.106.27.210/services/calendars/' + this.get('id');
+            }
+
+            return 'https://193.106.27.210/services/users/' + Utils.getUserId() + '/calendars';
+        },
 
         defaults: function() {
             return {
-                uuid: Utils.getUuid(),
                 title: 'Default calendar',
                 startTime: {
                     hours: 0,

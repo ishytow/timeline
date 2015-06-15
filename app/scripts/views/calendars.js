@@ -21,8 +21,8 @@ define([
 
         onTabSoreted: function(e, ui){
             $.each(this.$el.find('.calendars-tabs li.tab-item'), function(index, value){
-                var uuid = $(value).data('uuid');
-                this.collection.get($(value).data('uuid')).set({position: index});
+                var id = $(value).data('id');
+                this.collection.get(id).set({position: index});
             }.bind(this));
             //TODO:
             //this.collection.update();
@@ -50,7 +50,7 @@ define([
             }.bind(this));
             this.contextMenu.find('.edit-calendar').on('click', function(){
                 target.tab('show');
-                EventListener.get('timeline').trigger('edit-calendar-'+ target.data('uuid'));
+                EventListener.get('timeline').trigger('edit-calendar-'+ target.data('id'));
             });
             this.contextMenu.find('.remove-calendar').on('click', function(){
                 target.tab('show');
@@ -58,7 +58,7 @@ define([
             }.bind(this));
             this.contextMenu.find('.change-scale').on('click', function(){
                 target.tab('show');
-                EventListener.get('timeline').trigger('change-scale-'+ target.data('uuid'));
+                EventListener.get('timeline').trigger('change-scale-'+ target.data('id'));
             });
         },
 
@@ -72,29 +72,33 @@ define([
 
         addDblClickHendler: function(){
             this.$el.find('.calendars-tabs .calendar-tab-item').off('dblclick').on('dblclick', function(){
-                EventListener.get('timeline').trigger('edit-calendar-'+ $(this).data('uuid'));
+                EventListener.get('timeline').trigger('edit-calendar-'+ $(this).data('id'));
             });
         },
 
         addCalendar: function(){
             var calendarModel = new CalendarModel();
-            //TODO:
-            //calendarModel.save();
-            this.collection.add(calendarModel);
-            this.renderCalendar(calendarModel);
-            this.addDblClickHendler();
-            EventListener.get('timeline').trigger('edit-calendar-'+ calendarModel.get('uuid'));
+            calendarModel.save(null, {
+                success: function (model, response, options) {
+                    this.collection.add(calendarModel);
+                    this.renderCalendar(calendarModel);
+                    this.addDblClickHendler();
+                    EventListener.get('timeline').trigger('edit-calendar-'+ calendarModel.get('id'));
+                }.bind(this),
+                error: function (model, xhr, options) {
+                    console.log("error");
+                }
+            });
         },
 
         removeCalendar: function(target){
-            var calendarModel = this.collection.get(target.data('uuid'));
+            var calendarModel = this.collection.get(target.data('id'));
             this.collection.remove(calendarModel);
             if(target.parent('.tab-item').hasClass('active') && target.parent('.tab-item').prev().length > 0){
                 target.parent('.tab-item').prev().find('a.calendar-tab-item').tab('show');
             }
             target.parent('.tab-item').remove();
-            //TODO:
-            //calendarModel.destroy();
+            calendarModel.destroy();
         },
 
         render: function () {
@@ -110,10 +114,9 @@ define([
                 $(this).tab('show')
             });
 
-            EventListener.get('timeline').trigger('calendar-shown',{uuid: this.$el.find('.calendars-tabs li a').first().data('uuid')});
-
+            EventListener.get('timeline').trigger('calendar-shown',{id: this.$el.find('.calendars-tabs li a').first().data('id')});
             this.$el.find('.calendars-tabs a').on('shown.bs.tab', function (e) {
-                EventListener.get('timeline').trigger('calendar-shown',{uuid: $(e.target).data('uuid')});
+                EventListener.get('timeline').trigger('calendar-shown',{id: $(e.target).data('id')});
             });
             this.$el.find('.calendars-tabs').sortable({
                 containment: this.$el.find('.calendars-tabs'),

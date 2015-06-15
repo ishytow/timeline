@@ -3,12 +3,15 @@
 define([
     'underscore',
     'backbone',
-    'models/calendar'
-], function (_, Backbone, CalendarModel) {
+    'models/calendar',
+    'utils'
+], function (_, Backbone, CalendarModel, Utils) {
     'use strict';
 
     var CalendarsCollection = Backbone.Collection.extend({
-        url: 'https://193.106.27.210/services/stub/calendars?id=3',
+        url: function(){
+            return 'https://193.106.27.210/services/users/' + Utils.getUserId() + '/calendars'
+        },
 
         comparator: function(a, b) {
             a = a.get('position');

@@ -29,8 +29,9 @@ define([
         },
 
         renderEditModal: function(options){
-            $('#modals-container').html(this.editModalTemplate(this.model.toJSON()));
-            this.editModal = $('#modals-container #edit-modal-' + this.model.get('uuid'));
+            this.editModal = $(this.editModalTemplate(this.model.toJSON()));
+            $('#modals-container').html(this.editModal);
+            console.log(this.editModal);
             this.editModal.modal('show');
 
             this.editModal.find('.save').on('click', function(){
@@ -41,28 +42,29 @@ define([
 
                 this.model.set(updatedValues);
                 this.editModal.modal('hide');
-                //TODO:
-                //this.model.save();
-                if(options && options.save){
-                    options.save.call({}, this.model);
-                }
+                this.model.save({
+                    success: function(){
+                        if(options && options.save){
+                            options.save.call({}, this.model);
+                        }
+                    }
+                });
             }.bind(this));
         },
 
         renderRemoveModal: function(){
             $('#modals-container').html(this.removeModalTemplate(this.model.toJSON()));
-            this.removeModal = $('#modals-container #remove-modal-' + this.model.get('uuid'));
+            this.removeModal = $('#modals-container #remove-modal-' + this.model.get('id'));
             this.removeModal.modal('show');
             this.removeModal.find('.remove').on('click', function(){
                 this.removeModal.modal('hide');
                 this.model.trigger('destroy', this.model);
-                //TODO:
-                // this.model.destroy();
+                this.model.destroy();
             }.bind(this));
         },
 
         render: function () {
-            this.$el.html(this.template(this.model.toJSON())).attr('data-uuid', this.model.get('uuid'));
+            this.$el.html(this.template(this.model.toJSON())).attr('data-id', this.model.get('id'));
             this.$el.draggable({
                 cursor: 'move',
                 cursorAt:{
@@ -76,10 +78,10 @@ define([
                 revert: false
             });
 
-            EventListener.get('users').off('edit-user-' + this.model.get('uuid'))
-                .on('edit-user-' + this.model.get('uuid'), this.renderEditModal.bind(this));
-            EventListener.get('users').off('remove-user-' + this.model.get('uuid'))
-                .on('remove-user-' + this.model.get('uuid'), this.renderRemoveModal.bind(this));
+            EventListener.get('users').off('edit-user-' + this.model.get('id'))
+                .on('edit-user-' + this.model.get('id'), this.renderEditModal.bind(this));
+            EventListener.get('users').off('remove-user-' + this.model.get('id'))
+                .on('remove-user-' + this.model.get('id'), this.renderRemoveModal.bind(this));
 
             return this;
         },

@@ -12,7 +12,7 @@ define([
     var EventModel = Backbone.Model.extend({
         url: '',
 
-        idAttribute: 'uuid',
+        idAttribute: 'id',
 
         initialize: function() {
 
@@ -20,7 +20,6 @@ define([
 
         defaults: function(){
             return {
-                uuid: Utils.getUuid(),
                 title: "Default title",
                 description: "Default description",
                 startDate: moment().toDate().getTime(),

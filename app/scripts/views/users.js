@@ -26,35 +26,34 @@ define([
         },
 
         addUser: function(){
-            var userModel = new UserModel();
+            var userModel = new UserModel({}, {calendarId: this.collection.calendarId});
             var userView = new UserView({model: userModel});
             userView.renderEditModal({
                 save: function(model){
-                    console.log(model);
                     this.collection.add(model);
                 }.bind(this)
             });
         },
 
-        editUser: function(uuid){
-            EventListener.get('users').trigger('edit-user-' + uuid);
+        editUser: function(id){
+            EventListener.get('users').trigger('edit-user-' + id);
         },
 
-        removeUser: function(uuid){
-            EventListener.get('users').trigger('remove-user-' + uuid);
+        removeUser: function(id){
+            EventListener.get('users').trigger('remove-user-' + id);
         },
 
         renderContextMenu: function(e){
             e.preventDefault();
-            var uuid = null;
+            var id = null;
 
             if($(e.target).hasClass('user')){
-                uuid = $(e.target).data('uuid');
+                id = $(e.target).data('id');
             }else if($(e.target).parents('.user').length > 0){
-                uuid = $(e.target).parents('.user').data('uuid');
+                id = $(e.target).parents('.user').data('id');
             }
 
-            if(uuid !== null){
+            if(id !== null){
                 this.contextMenu.html(this.templateMenuUser());
             }else{
                 this.contextMenu.html(this.templateMenuUserDefault());
@@ -71,10 +70,10 @@ define([
                 this.addUser();
             }.bind(this));
             this.contextMenu.find('.edit').on('click', function(){
-                this.editUser(uuid);
+                this.editUser(id);
             }.bind(this));
             this.contextMenu.find('.remove').on('click', function(){
-                this.removeUser(uuid);
+                this.removeUser(id);
             }.bind(this));
         },
 

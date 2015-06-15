@@ -117,7 +117,7 @@ define([
         },
 
         render: function () {
-            this.$el.html(this.template()).attr('id', 'timeline-' + this.calendar.get('uuid'));
+            this.$el.html(this.template()).attr('id', 'timeline-' + this.calendar.get('id'));
             this.renderTimeline();
             return this;
         }

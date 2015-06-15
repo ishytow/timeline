@@ -56,9 +56,9 @@ define([
 
                 if(start !== null && end !== null){
                     items.push({
-                        id: this.model.get('uuid') + '-g-' + i,
-                        uuid: this.model.get('uuid'),
-                        className: 'event-item-' + this.model.get('uuid'),
+                        id: this.model.get('id') + '-g-' + i,
+                        eventId: this.model.get('id'),
+                        className: 'event-item-' + this.model.get('id'),
                         assignTo: this.model.get('assignTo'),
                         eventTitle: this.model.get('title'),
                         description: this.model.get('description'),
@@ -67,7 +67,7 @@ define([
                         start: start,
                         end: end,
                         group: i,
-                        subgroup: 'sg-' + this.model.get('uuid') + '-g-' + i
+                        subgroup: 'sg-' + this.model.get('id') + '-g-' + i
                     });
                 }
             }
@@ -87,17 +87,17 @@ define([
 
         initEvents: function(){
             if(this.isEventInitialized === false){
-                var selector = '.popover-content .event-uuid-' + this.model.get('uuid');
+                var selector = '.popover-content .event-id-' + this.model.get('id');
                 $(document).off('click', selector + ' .edit').on('click', selector + ' .edit', this.edit.bind(this));
                 $(document).off('click', selector + ' .remove').on('click', selector + ' .remove', this.removeEvent.bind(this));
                 EventListener.get('timeline')
-                    .off('edit-event-' + this.model.get('uuid'))
-                    .on('edit-event-' + this.model.get('uuid'), function(){
+                    .off('edit-event-' + this.model.get('id'))
+                    .on('edit-event-' + this.model.get('id'), function(){
                         this.edit();
                 }.bind(this));
                 EventListener.get('timeline')
-                    .off('remove-event-' + this.model.get('uuid'))
-                    .on('remove-event-' + this.model.get('uuid'), function(){
+                    .off('remove-event-' + this.model.get('id'))
+                    .on('remove-event-' + this.model.get('id'), function(){
                         this.removeEvent();
                 }.bind(this));
                 this.isEventInitialized = true;
@@ -114,7 +114,7 @@ define([
 
         renderEditModal: function(isNew){
             $('#modals-container').html(this.editModalTemplate(this.model.toJSON()));
-            this.editModal = $('#modals-container #edit-modal-' + this.model.get('uuid'));
+            this.editModal = $('#modals-container #edit-modal-' + this.model.get('id'));
             this.editModal.modal('show');
             this.editModal.find('.start-dp').datetimepicker({
                 defaultDate: this.model.get('startDate'),
@@ -133,7 +133,7 @@ define([
                 this.editModal.find('.end-dp').data("DateTimePicker").minDate(minDate).date(minDate);
             }.bind(this));
 
-            var usersCollection = new UsersCollection(Utils.getMockedUsers(this.calendar.get('uuid')));
+            var usersCollection = new UsersCollection(Utils.getMockedUsers(this.calendar.get('id')));
             var usersView = new UsersView({collection: usersCollection});
             this.editModal.find('.user').html(usersView.renderSelect().$selectEl);
 
@@ -174,7 +174,7 @@ define([
 
         renderRemoveModal: function(){
             $('#modals-container').html(this.removeModalTemplate(this.model.toJSON()));
-            this.removeModal = $('#modals-container #remove-modal-' + this.model.get('uuid'));
+            this.removeModal = $('#modals-container #remove-modal-' + this.model.get('id'));
             this.removeModal.modal('show');
             this.removeModal.find('.remove').on('click', function(){
                 this.removeModal.modal('hide');
@@ -186,7 +186,7 @@ define([
 
         initPopover: function(timeLineEl){
             var _this = this;
-            this.$el = timeLineEl.find('.event-item-' + this.model.get('uuid'));
+            this.$el = timeLineEl.find('.event-item-' + this.model.get('id'));
             this.$el.popover({
                 html : true,
                 title: function() {

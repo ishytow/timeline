@@ -250,8 +250,7 @@ define([
         onTabEditFinish: function(){
             var value = $(this.tabItemSelector).find('.calendar-title-edit input').val();
             this.model.set({title: value});
-            //TODO:
-            //this.model.save();
+            this.model.save();
             $(this.tabItemSelector).find('.calendar-tab-item').text(this.model.get('title'));
             $(this.tabItemSelector).find('.calendar-tab-item').slideDown();
             $(this.tabItemSelector).find('.calendar-title-edit').slideUp();
@@ -260,7 +259,7 @@ define([
 
         onDrop: function(e, el){
             var eventProperties = this.timelineView.timeline.getEventProperties(e);
-            this.onAddEvent(eventProperties, $(el.draggable).data('uuid'));
+            this.onAddEvent(eventProperties, $(el.draggable).data('id'));
         },
 
         initDroppable: function(){
@@ -272,8 +271,8 @@ define([
         },
 
         render: function () {
-            this.$el.html(this.template(this.model.toJSON())).attr('id', 'calendar-' + this.model.get('uuid'));
-            this.tabItemSelector = '.calendars-tabs li[data-uuid="' + this.model.get('uuid') + '"]';
+            this.$el.html(this.template(this.model.toJSON())).attr('id', 'calendar-' + this.model.get('id'));
+            this.tabItemSelector = '.calendars-tabs li[data-id="' + this.model.get('id') + '"]';
             this.contextMenu = $('#context-menu');
             this.$el.find('.timeline-container').html(this.renderTimeline().$el);
             this.$el.find('.timeline-container').on('mousewheel', this.onMouseWheel.bind(this));
@@ -301,8 +300,8 @@ define([
                 this.$el.find(".timeline-scale-range .slider")[0].destroy();
                 this.renderScaleRange();
             }.bind(this));
-            EventListener.get('timeline').on('edit-calendar-' + this.model.get('uuid'), this.onTabEdit.bind(this));
-            EventListener.get('timeline').on('change-scale-' + this.model.get('uuid'), this.onChangeScale.bind(this));
+            EventListener.get('timeline').on('edit-calendar-' + this.model.get('id'), this.onTabEdit.bind(this));
+            EventListener.get('timeline').on('change-scale-' + this.model.get('id'), this.onChangeScale.bind(this));
             return this;
         }
     });
