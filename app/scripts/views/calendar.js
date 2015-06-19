@@ -109,6 +109,7 @@ define([
         },
 
         onAddEvent: function(properties, userId){
+            console.log(arguments);
             if(properties.group !== null){
                 var options = {};
                 options = Utils.getNewEventDefaultDates(this.timelineView.groups.get(properties.group).day, properties.snappedTime);
@@ -231,8 +232,13 @@ define([
 
                 this.model.set('startTime', {hours: startTime.hour(), minutes: startTime.minute()});
                 this.model.set('endTime', {hours: (endTime.hour() !== 0) ? endTime.hour() : 24, minutes: endTime.minute()});
-                this.timelineView.updateTimeline({});
-                this.$el.find('.timeline-scale-range-container').slideUp();
+                this.model.save(null,{
+                    success: function(){
+                        console.log(111);
+                        this.timelineView.updateTimeline({});
+                        this.$el.find('.timeline-scale-range-container').slideUp();
+                    }.bind(this)
+                });
             }.bind(this));
             this.$el.find(".timeline-scale-range .remove").on('click', function(){
                 this.$el.find('.timeline-scale-range-container').slideUp();
@@ -250,11 +256,17 @@ define([
         onTabEditFinish: function(){
             var value = $(this.tabItemSelector).find('.calendar-title-edit input').val();
             this.model.set({title: value});
-            this.model.save();
-            $(this.tabItemSelector).find('.calendar-tab-item').text(this.model.get('title'));
-            $(this.tabItemSelector).find('.calendar-tab-item').slideDown();
-            $(this.tabItemSelector).find('.calendar-title-edit').slideUp();
-            this.isTitleEdit = false;
+            this.model.save(null,{
+                success : function(){
+                    $(this.tabItemSelector).find('.calendar-tab-item').text(this.model.get('title'));
+                    $(this.tabItemSelector).find('.calendar-tab-item').slideDown();
+                    $(this.tabItemSelector).find('.calendar-title-edit').slideUp();
+                    this.isTitleEdit = false;
+                }.bind(this),
+                error: function(){
+
+                }
+            });
         },
 
         onDrop: function(e, el){

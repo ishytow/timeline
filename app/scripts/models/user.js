@@ -34,6 +34,7 @@ define([
                 mobileNumber: '+380746464646',
                 workNumber: '+15322323345',
                 address: 'address',
+                active: true,
                 workTimeFrom: {
                     hours: null,
                     minutes: null

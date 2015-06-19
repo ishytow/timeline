@@ -42,12 +42,12 @@ define([
 
                 this.model.set(updatedValues);
                 this.editModal.modal('hide');
-                this.model.save({
+                this.model.save(null, {
                     success: function(){
                         if(options && options.save){
                             options.save.call({}, this.model);
                         }
-                    }
+                    }.bind(this)
                 });
             }.bind(this));
         },
