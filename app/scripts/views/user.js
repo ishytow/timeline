@@ -31,7 +31,6 @@ define([
         renderEditModal: function(options){
             this.editModal = $(this.editModalTemplate(this.model.toJSON()));
             $('#modals-container').html(this.editModal);
-            console.log(this.editModal);
             this.editModal.modal('show');
 
             this.editModal.find('.save').on('click', function(){
@@ -41,9 +40,9 @@ define([
                 };
 
                 this.model.set(updatedValues);
-                this.editModal.modal('hide');
                 this.model.save(null, {
                     success: function(){
+                        this.editModal.modal('hide');
                         if(options && options.save){
                             options.save.call({}, this.model);
                         }

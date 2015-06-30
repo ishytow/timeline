@@ -22,7 +22,15 @@ define([
         modalEl: null,
 
         initialize: function (options) {
-            this.calendar = options.calendar;
+            if(_.isObject(options)){
+                if(_.isObject(options.calendar)){
+                    this.calendar = options.calendar;
+                }
+                if(_.isObject(options.timeline)){
+                    this.timeline = options.timeline;
+                }
+            }
+
             EventListener.get('timeline').on('timeline-created', function(options){
                 this.initPopover(options.timeLineEl);
             }.bind(this));
@@ -30,7 +38,7 @@ define([
 
         getItemsByEvent: function(){
             var items = [];
-            var days = Utils.getDays();
+            var days = this.timeline.days;
             var eventStartDate = moment(this.model.get('startDate'));
             var eventEndDate = moment(this.model.get('endDate'));
             var startScaleDate = moment(Utils.getStartScaleDate(this.calendar));
@@ -112,9 +120,9 @@ define([
             return moment(date).clone().add(Utils.config.defaultEventMinHours,'hours');
         },
 
-        renderEditModal: function(isNew){
-            $('#modals-container').html(this.editModalTemplate(this.model.toJSON()));
-            this.editModal = $('#modals-container #edit-modal-' + this.model.get('id'));
+        renderEditModal: function(options){
+            this.editModal = $(this.editModalTemplate(this.model.toJSON()));
+            $('#modals-container').html(this.editModal);
             this.editModal.modal('show');
             this.editModal.find('.start-dp').datetimepicker({
                 defaultDate: this.model.get('startDate'),
@@ -133,20 +141,23 @@ define([
                 this.editModal.find('.end-dp').data("DateTimePicker").minDate(minDate).date(minDate);
             }.bind(this));
 
-            var usersCollection = new UsersCollection(Utils.getMockedUsers(this.calendar.get('id')));
-            var usersView = new UsersView({collection: usersCollection});
-            this.editModal.find('.user').html(usersView.renderSelect().$selectEl);
+            this.usersCollection = new UsersCollection();
+            this.usersCollection.setCalendarId(this.calendar.get('id')).fetch({
+                success: function(){
+                    var usersView = new UsersView({collection: this.usersCollection});
+                    this.editModal.find('.user').html(usersView.renderSelect().$selectEl);
+                    this.editModal.find('.users-select').select2({
+                        multiple: false,
+                        dropdownCssClass: 'select2-event-users'
+                    });
 
-            this.editModal.find('.users-select').select2({
-                multiple: false,
-                dropdownCssClass: 'select2-event-users'
+                    if(this.model.get('assignTo')){
+                        this.editModal.find('.users-select').val(this.model.get('assignTo')).trigger('change');
+                    }else{
+                        this.editModal.find('.users-select').val('').trigger('change');
+                    }
+                }.bind(this)
             });
-
-            if(this.model.get('assignTo')){
-                this.editModal.find('.users-select').val(this.model.get('assignTo')).trigger('change');
-            }else{
-                this.editModal.find('.users-select').val('').trigger('change');
-            }
 
             this.editModal.find('.save').on('click', function(){
                 var updatedValues = {
@@ -157,18 +168,21 @@ define([
                     assignTo: this.editModal.find('.users-select').val()
                 };
 
-                this.model.set(updatedValues);
-                this.editModal.modal('hide');
-                //TODO:
-                //this.model.save();
+                this.model.setCalendarId(this.calendar.get('id')).set(updatedValues);
+                this.model.save(null, {
+                    success: function(){
+                        this.editModal.modal('hide');
+                        if(options && options.save){
+                            options.save.call({}, this.model);
+                        }
+                    }.bind(this)
+                });
             }.bind(this));
 
             this.editModal.find('.cancel').on('click', function(){
-                if(isNew && isNew === true){
-                    this.model.trigger('cancel-create', this.model);
-                    //TODO:
-                    // this.model.destroy();
-                }
+                //if(isNew && isNew === true){
+                //    //this.model.trigger('cancel-create', this.model);
+                //}
             }.bind(this));
         },
 

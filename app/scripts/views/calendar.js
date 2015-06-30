@@ -21,8 +21,6 @@ define([
     var CalendarView = Backbone.View.extend({
         template: JST['app/scripts/templates/calendar.hbs'],
         contextMenuTemplates: {
-            onTimeline: JST['app/scripts/templates/menu-timeline.hbs'],
-            onItem: JST['app/scripts/templates/menu-item.hbs'],
             default: JST['app/scripts/templates/menu-default.hbs']
         },
         timelineView: null,
@@ -37,109 +35,84 @@ define([
 
         initialize: function(options){
             this.model.bind('remove', this.remove, this);
-            this.eventsCollection = new EventsCollection();
-            this.eventsView = new EventsView({collection: this.eventsCollection});
-            this.listenTo(this.eventsCollection, "change", this.onEventChange);
-            this.listenTo(this.eventsCollection, "destroy", this.onEventRemove);
-            this.listenTo(this.eventsCollection, "cancel-create", this.onEventCancelCreate);
         },
 
-        getTimelineView: function(updateItems){
-            var items;
-            if(updateItems && updateItems === true){
-                items = this.eventsView.renderItems(this.model).items;
-            }else{
-                items = this.eventsView.updateItems(this.model).items;
-            }
-            if(this.timelineView === null){
-                this.timelineView = new TimelineView({items: items, calendar: this.model});
-            }else{
-                this.timelineView.setTimelineOptions({items: items});
-            }
-            return this.timelineView;
-        },
+        //getTimelineView: function(updateItems){
+        //    if(this.timelineView === null){
+        //        this.timelineView = new TimelineView();
+        //    }
+        //    return this.timelineView;
+        //},
 
-        fetchEvents: function(){
-            //TODO: fetch!!!
-            this.eventsCollection.set(Utils.getMockedEvents(this.model));
-        },
+        //renderTimeline: function(){
+        //    return this.getTimelineView().render();
+        //},
 
-        renderTimeline: function(){
-            this.fetchEvents();
-            return this.getTimelineView().render();
-        },
+        //onEventChange: function(){
+        //    //TODO: change to this.updateTimeline
+        //    this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
+        //},
 
-        onEventChange: function(){
-            //TODO: change to this.updateTimeline
-            this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
-        },
+        //onEventCancelCreate: function(model){
+        //    this.eventsCollection.remove(model);
+        //},
 
-        onEventCancelCreate: function(model){
-            this.eventsCollection.remove(model);
-        },
+        //onEventRemove: function(model){
+        //    this.eventsCollection.remove(model);
+        //    //TODO: change to this.updateTimeline
+        //    this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
+        //},
 
-        onEventRemove: function(model){
-            this.eventsCollection.remove(model);
-            //TODO: change to this.updateTimeline
-            this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
-        },
+        //updateTimeline: function(options){
+        //    if(options && options.scrollDirection){
+        //        if(options.scrollDirection === 'prev'){
+        //            Utils.setWeek(Utils.getWeek() - 1);
+        //        }else{
+        //            Utils.setWeek(Utils.getWeek() + 1);
+        //        }
+        //    }
+        //    options.callback = this.initDroppable.bind(this);
+        //    this.eventsCollection.fetch({success: function(){
+        //        this.getTimelineView(true).updateTimeline(options);
+        //    }.bind(this)});
+        //},
 
-        updateTimeline: function(options){
-            if(options && options.scrollDirection){
-                if(options.scrollDirection === 'prev'){
-                    Utils.setWeek(Utils.getWeek() - 1);
-                }else{
-                    Utils.setWeek(Utils.getWeek() + 1);
-                }
-            }
-            options.callback = this.initDroppable.bind(this);
-            this.fetchEvents();
-            this.getTimelineView(true).updateTimeline(options);
-        },
+        //onMouseWheel: function(e){
+        //    var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1;
+        //    var scrollDirection;
+        //    if(e.deltaY > 0) {
+        //        scrollDirection = 'prev';
+        //    }else{
+        //        scrollDirection = 'next';
+        //    }
+        //    this.updateTimeline({scrollDirection: scrollDirection});
+        //},
 
-        onMouseWheel: function(e){
-            var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1;
-            var scrollDirection;
-            if(e.deltaY > 0) {
-                scrollDirection = 'prev';
-            }else{
-                scrollDirection = 'next';
-            }
-            this.updateTimeline({scrollDirection: scrollDirection});
-        },
-
-        onAddEvent: function(properties, userId){
-            console.log(arguments);
-            if(properties.group !== null){
-                var options = {};
-                options = Utils.getNewEventDefaultDates(this.timelineView.groups.get(properties.group).day, properties.snappedTime);
-                if(userId){
-                    options.assignTo = userId;
-                }
-                var eventModel = new EventModel(options);
-                var eventView = new EventView({model: eventModel, calendar: this.model});
-                this.eventsCollection.add(eventModel);
-                eventView.renderCreateModal();
-            }
-        },
+        //onAddEvent: function(properties, userId){
+        //    if(properties.group !== null){
+        //        var options = {};
+        //        options = Utils.getNewEventDefaultDates(this.timelineView.groups.get(properties.group).day, properties.snappedTime);
+        //        if(userId){
+        //            options.assignTo = userId;
+        //        }
+        //        var eventModel = new EventModel(options);
+        //        var eventView = new EventView({model: eventModel, calendar: this.model});
+        //        this.eventsCollection.add(eventModel);
+        //        eventView.renderCreateModal({
+        //            save: function(model){
+        //                this.eventsCollection.add(model);
+        //            }.bind(this)
+        //        });
+        //    }
+        //},
 
         onChangeScale: function(){
             this.$el.find('.timeline-scale-range-container').slideDown();
         },
 
         onDoubleClick: function(properties){
-            if(properties){
-                switch (properties.what) {
-                    case 'background':
-                        this.onAddEvent(properties);
-                        break;
-                    case 'axis':
-                        this.onChangeScale();
-                        break;
-                    case 'item':
-                        EventListener.get('timeline').trigger('edit-event-'+Utils.getEventIdByItemId(properties.item));
-                        break;
-                }
+            if(properties && properties.what === 'axis'){
+                this.onChangeScale();
             }
         },
 
@@ -147,16 +120,8 @@ define([
             if(properties){
                 if (properties.event.ctrlKey) return;
                 properties.event.preventDefault();
-                switch (properties.what) {
-                    case 'background':
-                        this.contextMenu.html(this.contextMenuTemplates.onTimeline());
-                        break;
-                    case 'item':
-                        this.contextMenu.html(this.contextMenuTemplates.onItem());
-                        break;
-                    default :
-                        this.contextMenu.html(this.contextMenuTemplates.default());
-                        break;
+                if(properties.what !== 'background' && properties.what !== 'item'){
+                    this.contextMenu.html(this.contextMenuTemplates.default());
                 }
 
                 this.contextMenu.css({
@@ -165,21 +130,6 @@ define([
                     left: properties.pageX + 'px',
                     top: properties.pageY + 'px'
                 }).off('click');
-                this.contextMenu.find('.add').on('click', function(){
-                    this.onAddEvent(properties);
-                }.bind(this));
-                this.contextMenu.find('.edit').on('click', function(){
-                    EventListener.get('timeline').trigger('edit-event-'+Utils.getEventIdByItemId(properties.item));
-                }.bind(this));
-                this.contextMenu.find('.remove').on('click', function(){
-                    EventListener.get('timeline').trigger('remove-event-'+Utils.getEventIdByItemId(properties.item));
-                }.bind(this));
-                this.contextMenu.find('.show-next').on('click', function(){
-                    this.updateTimeline({scrollDirection: 'next'})
-                }.bind(this));
-                this.contextMenu.find('.show-prev').on('click', function(){
-                    this.updateTimeline({scrollDirection: 'prev'})
-                }.bind(this));
                 this.contextMenu.find('.change-scale').on('click', this.onChangeScale.bind(this));
             }
             return false;
@@ -234,7 +184,6 @@ define([
                 this.model.set('endTime', {hours: (endTime.hour() !== 0) ? endTime.hour() : 24, minutes: endTime.minute()});
                 this.model.save(null,{
                     success: function(){
-                        console.log(111);
                         this.timelineView.updateTimeline({});
                         this.$el.find('.timeline-scale-range-container').slideUp();
                     }.bind(this)
@@ -274,23 +223,25 @@ define([
             this.onAddEvent(eventProperties, $(el.draggable).data('id'));
         },
 
-        initDroppable: function(){
-            this.timelineView.$el.find('.vis-foreground .vis-group').droppable({
-                hoverClass: 'hovered-group',
-                tolerance: 'pointer',
-                drop: this.onDrop.bind(this)
-            });
-        },
+        //initDroppable: function(){
+        //    this.timelineView.$el.find('.vis-foreground .vis-group').droppable({
+        //        hoverClass: 'hovered-group',
+        //        tolerance: 'pointer',
+        //        drop: this.onDrop.bind(this)
+        //    });
+        //},
 
         render: function () {
             this.$el.html(this.template(this.model.toJSON())).attr('id', 'calendar-' + this.model.get('id'));
             this.tabItemSelector = '.calendars-tabs li[data-id="' + this.model.get('id') + '"]';
             this.contextMenu = $('#context-menu');
-            this.$el.find('.timeline-container').html(this.renderTimeline().$el);
-            this.$el.find('.timeline-container').on('mousewheel', this.onMouseWheel.bind(this));
+            this.timelineView = new TimelineView({calendar: this.model});
+            this.$el.find('.timeline-container').html(this.timelineView.render().$el);
+            //this.$el.find('.timeline-container').on('mousewheel', this.onMouseWheel.bind(this));
             this.timelineView.timeline.on('doubleClick', this.onDoubleClick.bind(this));
             this.timelineView.timeline.on('contextmenu', this.onTimelineContextMenu.bind(this));
-            this.initDroppable();
+            //this.initDroppable();
+
             $(document).on('click', function(e){
                 if($(e.target).parents(this.tabItemSelector).length === 0
                     && !$(e.target).is(this.tabItemSelector)
@@ -306,6 +257,7 @@ define([
                     }
                 }
             }.bind(this));
+
             this.renderScaleRange();
             EventListener.get('timeline').on('use24', function(){
                 this.updateTimeline({});
@@ -314,6 +266,7 @@ define([
             }.bind(this));
             EventListener.get('timeline').on('edit-calendar-' + this.model.get('id'), this.onTabEdit.bind(this));
             EventListener.get('timeline').on('change-scale-' + this.model.get('id'), this.onChangeScale.bind(this));
+
             return this;
         }
     });

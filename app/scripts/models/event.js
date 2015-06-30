@@ -10,25 +10,32 @@ define([
     'use strict';
 
     var EventModel = Backbone.Model.extend({
-        url: '',
-
         idAttribute: 'id',
+        calendarId: '',
 
-        initialize: function() {
+        setCalendarId: function(id){
+            this.calendarId = id;
+            return this;
+        },
 
+        url: function(){
+            if(typeof (this.get('id')) !== 'undefined' && this.get('id') !== null && this.get('id') !== ''){
+                return 'https://193.106.27.210/services/events/' + this.get('id');
+            }
+
+            return 'https://193.106.27.210/services/calendars/' + this.calendarId + '/events';
         },
 
         defaults: function(){
             return {
-                title: "Default title",
-                description: "Default description",
-                startDate: moment().toDate().getTime(),
-                endDate: moment().add(Utils.config.defaultEventMinHours, 'hours').toDate().getTime(),
-                assignTo: '',
-                createdBy: '',
-                calendarId: '',
-                modRequest: '',
-                conversationId: ''
+                "title":"title",
+                "description":"Description",
+                "startDate": '',
+                "endDate":'',
+                "assignTo": '',
+                "createdBy": Utils.getUserId(),
+                "modifyRequest":null,
+                "conversation":null
             }
         },
 
