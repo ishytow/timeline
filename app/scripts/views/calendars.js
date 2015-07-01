@@ -93,12 +93,15 @@ define([
 
         removeCalendar: function(target){
             var calendarModel = this.collection.get(target.data('id'));
-            this.collection.remove(calendarModel);
-            if(target.parent('.tab-item').hasClass('active') && target.parent('.tab-item').prev().length > 0){
-                target.parent('.tab-item').prev().find('a.calendar-tab-item').tab('show');
-            }
-            target.parent('.tab-item').remove();
-            calendarModel.destroy();
+            calendarModel.destroy({
+                success: function(){
+                    this.collection.remove(calendarModel);
+                    if(target.parent('.tab-item').hasClass('active') && target.parent('.tab-item').prev().length > 0){
+                        target.parent('.tab-item').prev().find('a.calendar-tab-item').tab('show');
+                    }
+                    target.parent('.tab-item').remove();
+                }.bind(this)
+            });
         },
 
         render: function () {

@@ -56,9 +56,9 @@ define([
             this.removeModal = $('#modals-container #remove-modal-' + this.model.get('id'));
             this.removeModal.modal('show');
             this.removeModal.find('.remove').on('click', function(){
-                this.removeModal.modal('hide');
-                this.model.trigger('destroy', this.model);
-                this.model.destroy();
+                this.model.destroy({success: function(){
+                    this.removeModal.modal('hide');
+                }});
             }.bind(this));
         },
 

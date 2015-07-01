@@ -19,7 +19,6 @@ define([
 
         editModalTemplate: JST['app/scripts/templates/event-edit-modal.hbs'],
         removeModalTemplate: JST['app/scripts/templates/event-remove-modal.hbs'],
-        modalEl: null,
 
         initialize: function (options) {
             if(_.isObject(options)){
@@ -30,10 +29,6 @@ define([
                     this.timeline = options.timeline;
                 }
             }
-
-            EventListener.get('timeline').on('timeline-created', function(options){
-                this.initPopover(options.timeLineEl);
-            }.bind(this));
         },
 
         getItemsByEvent: function(){
@@ -79,7 +74,7 @@ define([
                     });
                 }
             }
-
+            
             return items;
         },
 
@@ -98,6 +93,7 @@ define([
                 var selector = '.popover-content .event-id-' + this.model.get('id');
                 $(document).off('click', selector + ' .edit').on('click', selector + ' .edit', this.edit.bind(this));
                 $(document).off('click', selector + ' .remove').on('click', selector + ' .remove', this.removeEvent.bind(this));
+
                 EventListener.get('timeline')
                     .off('edit-event-' + this.model.get('id'))
                     .on('edit-event-' + this.model.get('id'), function(){
@@ -112,8 +108,8 @@ define([
             }
         },
 
-        renderCreateModal: function(){
-            this.renderEditModal(true);
+        renderCreateModal: function(options){
+            this.renderEditModal(options);
         },
 
         getMinDate: function(date){
@@ -172,35 +168,49 @@ define([
                 this.model.save(null, {
                     success: function(){
                         this.editModal.modal('hide');
-                        if(options && options.save){
-                            options.save.call({}, this.model);
+                        this.updateItems();
+                        if(options && options.create){
+                            options.create.call({}, this.model);
                         }
                     }.bind(this)
                 });
             }.bind(this));
 
             this.editModal.find('.cancel').on('click', function(){
-                //if(isNew && isNew === true){
-                //    //this.model.trigger('cancel-create', this.model);
-                //}
+
             }.bind(this));
+        },
+
+        updateItems: function(){
+            this.removeItems();
+            this.items = this.getItemsByEvent();
+            this.timeline.itemSet.getItems().add(this.items);
+            this.initPopover();
+            this.initEvents();
+        },
+
+        removeItems: function(){
+            this.timeline.itemSet.getItems().remove(this.items);
         },
 
         renderRemoveModal: function(){
-            $('#modals-container').html(this.removeModalTemplate(this.model.toJSON()));
-            this.removeModal = $('#modals-container #remove-modal-' + this.model.get('id'));
+            this.removeModal = $(this.removeModalTemplate(this.model.toJSON()));
             this.removeModal.modal('show');
             this.removeModal.find('.remove').on('click', function(){
-                this.removeModal.modal('hide');
-                this.model.trigger('destroy', this.model);
-                //TODO:
-                // this.model.destroy();
+                this.model.destroy({success: function(){
+                    this.removeModal.modal('hide');
+                    this.removeItems();
+                }.bind(this),
+                error: function(){
+                    console.log(arguments);
+                }});
             }.bind(this));
         },
 
-        initPopover: function(timeLineEl){
+        initPopover: function(){
             var _this = this;
-            this.$el = timeLineEl.find('.event-item-' + this.model.get('id'));
+            this.$el = $(this.timeline.dom.center).find('.event-item-' + this.model.get('id'));
+
             this.$el.popover({
                 html : true,
                 title: function() {
@@ -214,12 +224,27 @@ define([
                 placement: 'top'
             });
 
-            this.initEvents();
+            var popovers = this.timeline.$el.find('.popover-trigger').parents('.vis-item[class*="event-item-"]');
+            popovers.click(function(){
+                popovers.not(this).popover('hide');
+            });
+            $(document).on('click', function (e) {
+                if ((!$(e.target).is('.vis-item[class*="event-item-"]')
+                    && $(e.target).parents('.vis-item[class*="event-item-"]').length === 0
+                    && $(e.target).parents('.popover.in').length === 0)
+                    || $(e.target).is('.display-mode .edit, .display-mode .remove')) {
+                    popovers.popover('hide');
+                }
+            });
         },
 
-        renderItem: function(calendar){
-            this.calendar = calendar;
+        renderItem: function(){
             this.items = this.getItemsByEvent();
+            EventListener.get('timeline').on('timeline-created', function(){
+                this.initPopover();
+                this.initEvents();
+            }.bind(this));
+            console.log(this.timeline);
             return this;
         }
     });

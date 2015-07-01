@@ -20,7 +20,7 @@ define([
         template: JST['app/scripts/templates/timeline.hbs'],
         contextMenuTemplates: {
             onTimeline: JST['app/scripts/templates/menu-timeline.hbs'],
-            onItem: JST['app/scripts/templates/menu-item.hbs'],
+            onItem: JST['app/scripts/templates/menu-item.hbs']
         },
 
         tagName: 'div',
@@ -35,26 +35,10 @@ define([
             this.eventsCollection = new EventsCollection({
                 calendarId: this.calendar.get('id')
             });
-
-            this.listenTo(this.eventsCollection, "change", this.onEventChange);
-            this.listenTo(this.eventsCollection, "destroy", this.onEventRemove);
-            this.listenTo(this.eventsCollection, "cancel-create", this.onEventCancelCreate);
         },
 
         initPopovers: function(){
-            EventListener.get('timeline').trigger('timeline-created', {timeLineEl: this.$el});
-            var popoversSelectors = this.$el.find('.popover-trigger').parents('.vis-item[class*="event-item-"]');
-            popoversSelectors.click(function(){
-                popoversSelectors.not(this).popover('hide');
-            });
-            $(document).on('click', function (e) {
-                if ((!$(e.target).is('.vis-item[class*="event-item-"]')
-                    && $(e.target).parents('.vis-item[class*="event-item-"]').length === 0
-                    && $(e.target).parents('.popover.in').length === 0)
-                    || $(e.target).is('.display-mode .edit, .display-mode .remove')) {
-                    popoversSelectors.popover('hide');
-                }
-            });
+            EventListener.get('timeline').trigger('timeline-created');
         },
 
         initEvents: function(){
@@ -71,7 +55,6 @@ define([
                     }.bind(this));
                 }
             }.bind(this));
-            this.initPopovers();
         },
 
         //renderTimeline: function(options){
@@ -115,22 +98,6 @@ define([
         //    }
         //},
 
-        onEventChange: function(){
-            //TODO: change itemset
-            //this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
-        },
-
-        onEventCancelCreate: function(model){
-            this.eventsCollection.remove(model);
-        },
-
-        onEventRemove: function(model){
-            //TODO: change itemset
-            //this.eventsCollection.remove(model);
-
-            //this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
-        },
-
         onMouseWheel: function(e){
             var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1;
             var scrollDirection;
@@ -149,11 +116,12 @@ define([
                     options.assignTo = userId;
                 }
                 var eventModel = new EventModel(options);
-                var eventView = new EventView({model: eventModel, calendar: this.calendar});
+                var eventView = new EventView({model: eventModel, timeline: this.timeline, calendar: this.calendar});
                 this.eventsCollection.add(eventModel);
                 eventView.renderCreateModal({
-                    save: function(model){
+                    create: function(model){
                         this.eventsCollection.add(model);
+                        //this.timeline.itemSet.getItems().add(eventView.renderItem().items);
                     }.bind(this)
                 });
             }
@@ -192,7 +160,7 @@ define([
                     top: properties.pageY + 'px'
                 }).off('click');
                 this.contextMenu.find('.add').on('click', function(){
-                    this.onAddEvent(properties);
+                    this.addEvent(properties);
                 }.bind(this));
                 this.contextMenu.find('.edit').on('click', function(){
                     EventListener.get('timeline').trigger('edit-event-'+Utils.getEventIdByItemId(properties.item));
@@ -210,39 +178,54 @@ define([
             return false;
         },
 
+        onDrop: function(e, el){
+            var eventProperties = this.timeline.getEventProperties(e);
+            this.addEvent(eventProperties, $(el.draggable).data('id'));
+        },
+
         render: function () {
+            this.contextMenu = $('#context-menu');
             this.$el.html(this.template()).attr('id', 'timeline-' + this.calendar.get('id'));
 
             if(this.timeline === null){
                 this.timeline = new vis.Timeline(this.el);
             }
 
+            this.timeline.$el = this.$el;
+
             this.timeline.setOptions(Utils.getTimelineOptions(this.calendar));
             this.timeline.setGroups(Utils.getGroups(this.offset, this.depth));
 
             this.timeline.on('doubleClick', this.onDoubleClick.bind(this));
             this.timeline.on('contextmenu', this.showContextMenu.bind(this));
-
             this.$el.on('mousewheel', this.onMouseWheel.bind(this));
 
+            this.$el.find('.vis-foreground .vis-group').droppable({
+                hoverClass: 'hovered-group',
+                tolerance: 'pointer',
+                drop: this.onDrop.bind(this)
+            });
 
             this.eventsCollection.fetch({
                 data: {
                     offset: this.offset,
                     depth: this.depth
                 },
+                silent: true,
                 success: function(){
                     this.timeline.days = Utils.getDays(this.offset, this.depth);
-                    this.eventsView = new EventsView({collection: this.eventsCollection, timeline: this.timeline});
+                    this.eventsView = new EventsView({
+                        collection: this.eventsCollection,
+                        timeline: this.timeline,
+                        calendar: this.calendar
+                    });
                     this.timeline.setItems(this.eventsView.renderItems().items);
+                    this.initEvents();
+                    this.initPopovers();
                 }.bind(this)
             });
 
 
-
-
-            this.initEvents();
-            this.initPopovers();
             return this;
         }
     });

@@ -37,75 +37,6 @@ define([
             this.model.bind('remove', this.remove, this);
         },
 
-        //getTimelineView: function(updateItems){
-        //    if(this.timelineView === null){
-        //        this.timelineView = new TimelineView();
-        //    }
-        //    return this.timelineView;
-        //},
-
-        //renderTimeline: function(){
-        //    return this.getTimelineView().render();
-        //},
-
-        //onEventChange: function(){
-        //    //TODO: change to this.updateTimeline
-        //    this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
-        //},
-
-        //onEventCancelCreate: function(model){
-        //    this.eventsCollection.remove(model);
-        //},
-
-        //onEventRemove: function(model){
-        //    this.eventsCollection.remove(model);
-        //    //TODO: change to this.updateTimeline
-        //    this.getTimelineView().updateTimeline({callback: this.initDroppable.bind(this)});
-        //},
-
-        //updateTimeline: function(options){
-        //    if(options && options.scrollDirection){
-        //        if(options.scrollDirection === 'prev'){
-        //            Utils.setWeek(Utils.getWeek() - 1);
-        //        }else{
-        //            Utils.setWeek(Utils.getWeek() + 1);
-        //        }
-        //    }
-        //    options.callback = this.initDroppable.bind(this);
-        //    this.eventsCollection.fetch({success: function(){
-        //        this.getTimelineView(true).updateTimeline(options);
-        //    }.bind(this)});
-        //},
-
-        //onMouseWheel: function(e){
-        //    var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1;
-        //    var scrollDirection;
-        //    if(e.deltaY > 0) {
-        //        scrollDirection = 'prev';
-        //    }else{
-        //        scrollDirection = 'next';
-        //    }
-        //    this.updateTimeline({scrollDirection: scrollDirection});
-        //},
-
-        //onAddEvent: function(properties, userId){
-        //    if(properties.group !== null){
-        //        var options = {};
-        //        options = Utils.getNewEventDefaultDates(this.timelineView.groups.get(properties.group).day, properties.snappedTime);
-        //        if(userId){
-        //            options.assignTo = userId;
-        //        }
-        //        var eventModel = new EventModel(options);
-        //        var eventView = new EventView({model: eventModel, calendar: this.model});
-        //        this.eventsCollection.add(eventModel);
-        //        eventView.renderCreateModal({
-        //            save: function(model){
-        //                this.eventsCollection.add(model);
-        //            }.bind(this)
-        //        });
-        //    }
-        //},
-
         onChangeScale: function(){
             this.$el.find('.timeline-scale-range-container').slideDown();
         },
@@ -218,19 +149,6 @@ define([
             });
         },
 
-        onDrop: function(e, el){
-            var eventProperties = this.timelineView.timeline.getEventProperties(e);
-            this.onAddEvent(eventProperties, $(el.draggable).data('id'));
-        },
-
-        //initDroppable: function(){
-        //    this.timelineView.$el.find('.vis-foreground .vis-group').droppable({
-        //        hoverClass: 'hovered-group',
-        //        tolerance: 'pointer',
-        //        drop: this.onDrop.bind(this)
-        //    });
-        //},
-
         render: function () {
             this.$el.html(this.template(this.model.toJSON())).attr('id', 'calendar-' + this.model.get('id'));
             this.tabItemSelector = '.calendars-tabs li[data-id="' + this.model.get('id') + '"]';
@@ -260,7 +178,6 @@ define([
 
             this.renderScaleRange();
             EventListener.get('timeline').on('use24', function(){
-                this.updateTimeline({});
                 this.$el.find(".timeline-scale-range .slider")[0].destroy();
                 this.renderScaleRange();
             }.bind(this));
