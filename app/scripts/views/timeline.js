@@ -27,8 +27,16 @@ define([
         items: [],
         calendar: null,
         timeline: null,
+
         offset: Utils.config.offset,
         depth: Utils.config.depth,
+
+        currentDay: Utils.getDayByOffset(this.offset),
+
+        loadedDays: {
+            start: null,
+            end: null
+        },
 
         initialize: function (options) {
             this.calendar = options.calendar;
@@ -97,16 +105,6 @@ define([
         //        }.bind(this));
         //    }
         //},
-
-        onMouseWheel: function(e){
-            var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1;
-            var scrollDirection;
-            if(e.deltaY > 0) {
-                scrollDirection = 'prev';
-            }else{
-                scrollDirection = 'next';
-            }
-        },
 
         addEvent: function(properties, userId){
             if(properties.group !== null){
@@ -183,6 +181,57 @@ define([
             this.addEvent(eventProperties, $(el.draggable).data('id'));
         },
 
+        fetchEvents: function(options){
+            var defaultOptions = {
+                remove: false,
+                data: {
+                    offset: this.offset,
+                    depth: this.depth
+                }
+            };
+            $.extend(true, defaultOptions, options);
+            this.eventsCollection.fetch(defaultOptions);
+        },
+
+        onMouseWheel: function(e){
+            var events = e.originalEvent.wheelDelta || e.originalEvent.detail*-1;
+            var newOffset = this.offset;
+            var newCurrentDay = this.currentDay;
+            if(e.deltaY > 0) {
+                newCurrentDay -= 1;
+                newOffset = this.offset - this.depth;
+            }else{
+                newCurrentDay += 1;
+                newOffset = this.offset + this.depth;
+            }
+
+            this.fetchEvents({
+                data: {
+                    offset: newOffset
+                },
+                success: function(){
+                    this.offset = newOffset;
+                    this.currentDay = newCurrentDay;
+
+                    var newStartDay = Utils.getDayByOffset(this.offset);
+                    var newEndDay = Utils.getDayByOffset(this.offset + this.depth);
+
+                    if(newStartDay.isBefore(this.loadedDays.start, 'hour')){
+                        this.loadedDays.start = newStartDay;
+                    }
+                    if(newEndDay.isAfter(this.loadedDays.end, 'hour')){
+                        this.loadedDays.end = newEndDay;
+                    }
+
+                    this.timeline.setGroups(Utils.getGroups(step, this.depth));
+                    this.timeline.days = Utils.getDays(this.offset, this.depth);
+                    this.timeline.setItems(this.eventsView.renderItems().items);
+                    this.initEvents();
+                    this.initPopovers();
+                }.bind(this)
+            });
+        },
+
         render: function () {
             this.contextMenu = $('#context-menu');
             this.$el.html(this.template()).attr('id', 'timeline-' + this.calendar.get('id'));
@@ -206,13 +255,10 @@ define([
                 drop: this.onDrop.bind(this)
             });
 
-            this.eventsCollection.fetch({
-                data: {
-                    offset: this.offset,
-                    depth: this.depth
-                },
-                silent: true,
+            this.fetchEvents({
                 success: function(){
+                    this.loadedDays.start = Utils.getDayByOffset(this.offset);
+                    this.loadedDays.end = Utils.getDayByOffset(this.offset+ this.depth);
                     this.timeline.days = Utils.getDays(this.offset, this.depth);
                     this.eventsView = new EventsView({
                         collection: this.eventsCollection,
@@ -222,9 +268,9 @@ define([
                     this.timeline.setItems(this.eventsView.renderItems().items);
                     this.initEvents();
                     this.initPopovers();
+
                 }.bind(this)
             });
-
 
             return this;
         }

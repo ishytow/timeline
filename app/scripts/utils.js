@@ -73,11 +73,15 @@ define(['moment', 'templates'],function(moment, JST){
                 return groups;
             },
 
+            getDayByOffset: function(offset){
+                return moment().add(offset, 'days').hour(0).minute(0).second(0).locale('en');
+            },
+
             getDays: function(offset, depth){
                 var days = [];
                 for (var i = 0; i < depth; i++){
                     var offSetDelta = i + offset;
-                    days.push(moment().add(offSetDelta, 'days').hour(0).minute(0).second(0).locale('en'));
+                    days.push(this.getDayByOffset(offSetDelta));
                 }
                 return days;
             },

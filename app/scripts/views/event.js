@@ -74,7 +74,7 @@ define([
                     });
                 }
             }
-            
+
             return items;
         },
 
@@ -185,12 +185,14 @@ define([
             this.removeItems();
             this.items = this.getItemsByEvent();
             this.timeline.itemSet.getItems().add(this.items);
+            this.timeline.redraw();
             this.initPopover();
             this.initEvents();
         },
 
         removeItems: function(){
             this.timeline.itemSet.getItems().remove(this.items);
+            this.timeline.redraw();
         },
 
         renderRemoveModal: function(){
@@ -244,7 +246,6 @@ define([
                 this.initPopover();
                 this.initEvents();
             }.bind(this));
-            console.log(this.timeline);
             return this;
         }
     });
